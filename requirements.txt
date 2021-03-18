@@ -1,0 +1,6 @@
+torch
+result
+gym
+torchvision
+
+streamlit
