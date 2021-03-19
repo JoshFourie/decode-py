@@ -18,7 +18,7 @@ Our core libraries are released as open-source software.
 Right now, you can install from source and run an example.
 
 ```
-$ git clone git@github.com:ZaliaFlow/decode.git
+$ git clone git@github.com:ZaliaFlow/decode-py.git
 $ cd decode
 $ python3 -m pip install -r requirements.txt
 $ cd src
