@@ -10,7 +10,7 @@ write and train our RL agents and then deploy that into a front-end for others t
 No more crawling through Python code and more focus on seeing algorithms in action.
 
 ## Who are we?
-Zalia Flow [zaliaflow.io](zaliaflow.io) is an enterprise toolkit for building artificial intelligence that people delight in trusting. 
+Zalia Flow ([zaliaflow.io])(zaliaflow.io) is an enterprise toolkit for building artificial intelligence that people delight in trusting. 
 Our core libraries are released as open-source software.
 
 # Getting started
