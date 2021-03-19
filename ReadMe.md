@@ -37,3 +37,8 @@ memory.update(parent = memory_display, children = None).unwrap()
 
 This is a high-level API for getting an experience buffer for Deep Q-Networks that will
 open up a display of the agent's results from sampling the reward distribution.
+
+## How can you help?
+Help us find out what's the single most impactful view of your machine-learning code that would make it effortless to explain.
+
+Book a meeting with our team on [https://www.zaliaflow.io/book-online](zaliaflow.io/book-online) to chat.
