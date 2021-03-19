@@ -18,9 +18,9 @@ import streamlit as st
 Observation: TypeAlias = OpenAI_ObservationBlock[Tensor, Tensor, Tensor, Tensor]
 Memory: TypeAlias = ReplayMemoryBlock[Observation]
 
-try:
-    env = gym.make('Atlantis-ram-v0')
+env = gym.make('Pong-v0')
 
+try:
     state = env.reset()
 
     memory = Memory(engine = Memory.make.new(capacity = 1000).unwrap())
@@ -49,5 +49,7 @@ try:
 
         memory.engine().unwrap().push(observation, overwrite = True).unwrap()
         memory.update(parent = memory_display, children = None).unwrap()
+
+except Exception as error: raise error
 
 finally: env.close()
