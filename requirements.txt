@@ -1,6 +1,7 @@
 torch
 result
-gym
+gym[atari]
 torchvision
 
 streamlit
+pytest
