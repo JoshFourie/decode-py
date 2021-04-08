@@ -2,7 +2,7 @@
 The `.torch.obervation.block` module wraps the widget and engine components in a MemoryBlock.
 '''
 
-from src.rl.showcase.interface import Display
+from src.showcase.interface import Display
 from typing import Any, Generic, Sequence, TypeVar
 
 from result.result import Err, Ok, Result

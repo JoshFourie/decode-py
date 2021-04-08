@@ -5,11 +5,9 @@ The .blocks submodule is responsible for combining the building blocks of reinfo
 from abc import abstractmethod
 
 from result.result import Err, Result
-from src.rl.blocks.engine.interface.observation import Observation
 from typing import Any, Generic, TypeVar
 
-from ..showcase.interface import Display
-from .engine.interface.memory import Memory 
+from ...showcase.interface import Display
 
 
 T = TypeVar('T')
