@@ -2,13 +2,11 @@
 The `.torch.memory.block` module wraps the widget and engine components in a MemoryBlock.
 '''
 
-from src.rl.showcase.interface import Display
-
 from typing import Any, Generic, List, Sequence, TypeVar
 from result import Result, Err, Ok
 from typing_extensions import TypeAlias
 
-from ....interface import MemoryBlock
+from ....interface import MemoryBlock, Display
 from .engine import ReplayMemoryBatch, ReplayMemory, ReplayMemoryFactory
 
 import pandas as pd
