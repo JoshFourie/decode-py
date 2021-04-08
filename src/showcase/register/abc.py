@@ -34,20 +34,20 @@ class RegisterMediator(Generic[NodeKey, Displayable], ABC):
     @abstractmethod
     def get_displayable(self, node_key: NodeKey, *args: Any, **kwarg: Any) -> Displayable:
         '''
-        Gets a display for this node key.
+        Gets a displayable for this node key.
         '''
         raise NotImplementedError
 
 
-class DisplayDatabase(Generic[NodeKey, DisplayableSchema], ABC):
+class DisplayablesDatabase(Generic[NodeKey, DisplayableSchema], ABC):
     '''
-    ABC for classes that can look up a `DisplaySchema` from a `NodeKey`.
+    ABC for classes that can look up a `DisplayableSchema` from a `NodeKey`.
     '''
 
     @abstractmethod
     def lookup_node(self, node_key: NodeKey, *args: Any, **kwargs: Any) -> DisplayableSchema:
         '''
-        Looks up a node key to find a display schema.
+        Looks up a node key to find a displayable schema.
         '''
         raise NotImplementedError
 
@@ -76,3 +76,4 @@ class DisplayableBuilder(Generic[NodeKey, NodeMemento, Displayable]):
         Builds a displayable from this node key and node memento.
         '''
         raise NotImplementedError
+        
