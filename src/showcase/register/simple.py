@@ -7,8 +7,8 @@ from typing import Any, Generic
 from collections import UserDict
 
 # library imports
-from ..types import DisplayableSchema, NodeKey
-from ..abc import DisplayablesDatabase
+from .types import DisplayableSchema, NodeKey
+from .abc import DisplayablesDatabase
 
 
 class SimpleDisplayablesDatabase\
