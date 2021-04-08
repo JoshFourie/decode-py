@@ -4,11 +4,9 @@ The .showcase submodule is responsible for managing the displaying of the assemb
 This file is an interface for upstream modules to interact with the .showcase module.
 '''
 
+# built-in libraries
 from typing import Any, Generic, TypeVar
-
 from abc import ABC, abstractmethod
-
-from result import Result, Err
 
 
 T = TypeVar('T')
@@ -16,7 +14,7 @@ U = TypeVar('U')
 V = TypeVar('V')
 
 
-class Display(ABC, Generic[T, U, V]):
+class Display(Generic[T, U, V], ABC):
     '''
     ABC for things that can return a display to a showcase runner.
 
@@ -27,15 +25,15 @@ class Display(ABC, Generic[T, U, V]):
     '''
 
     @abstractmethod
-    def display(self, parent: U, children: V, **kwargs: Any) -> Result[T, ValueError]:
+    def display(self, parent: U, children: V, **kwargs: Any) -> T:
         '''
         Displays the block in a showcase environment.
         '''
-        return Err(ValueError(NotImplementedError))
+        raise NotImplementedError
 
     @abstractmethod
-    def update(self, parent: U, children: V, **kwargs: Any) -> Result[T, ValueError]:
+    def update(self, parent: U, children: V, **kwargs: Any) -> T:
         '''
         Updates a block in a showcase environment.
         '''
-        return Err(ValueError(NotImplementedError))
+        raise NotImplementedError
