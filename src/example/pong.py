@@ -14,14 +14,16 @@ from src.rl.blocks import ReplayMemoryBlock, OpenAI_ObservationBlock
 
 import streamlit as st
 
+import numpy
+
 
 Observation: TypeAlias = OpenAI_ObservationBlock[Tensor, Tensor, Tensor, Tensor]
 Memory: TypeAlias = ReplayMemoryBlock[Observation]
 
-env = gym.make('Pong-v0')
+env: gym.Env = gym.make('Pong-v0')
 
 try:
-    state = env.reset()
+    state: numpy.ndarray  = env.reset()
 
     memory = Memory(engine = Memory.make.new(capacity = 1000).unwrap())
 
@@ -35,7 +37,7 @@ try:
     while not done:
         env.render()
 
-        action = env.action_space.sample()
+        action: int = env.action_space.sample()
         next_state, reward, done, info = env.step(action)
 
         observation = Observation(Observation.make.new(
