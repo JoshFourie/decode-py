@@ -9,12 +9,12 @@ from abc import abstractmethod, ABC
 from typing import Any, Generic
 
 # library imports
-from .types import DisplayableSchema, Displayable, NodeDetails, NodeKey, NodeMemento
+from .types import DisplayableSchema, Displayable, DisplayableTemplate, NodeDetails, NodeKey, NodeMemento
 
 
 class GetMemento(Generic[NodeKey, NodeMemento], ABC):
     '''
-    ABC for classes that can make a node memento from a node key.
+    ABC for classes that can make a `NodeMemento` from a `NodeKey`.
     '''
 
     @abstractmethod
@@ -52,9 +52,22 @@ class DisplayablesDatabase(Generic[NodeKey, DisplayableSchema], ABC):
         raise NotImplementedError
 
 
+class DisplayableTemplateFactory(Generic[NodeKey, DisplayableTemplate], ABC):
+    '''
+    ABC for classes that can make a `DisplayableTemplate` from a `NodeKey`.
+    '''
+
+    @abstractmethod
+    def make_template(self, node_key: NodeKey, *args: Any, **kwargs: Any) -> DisplayableTemplate:
+        '''
+        Makes a `DisplayableTemplate` from a `NodeKey`.
+        '''
+        raise NotImplementedError
+
+
 class NodeDetailsFactory(Generic[NodeMemento, NodeDetails], ABC):
     '''
-    ABC for classes that can make node details from a node memento.
+    ABC for classes that can make `NodeDetails` from a `NodeMemento`.
     '''
 
     @abstractmethod
@@ -67,7 +80,7 @@ class NodeDetailsFactory(Generic[NodeMemento, NodeDetails], ABC):
 
 class DisplayableBuilder(Generic[NodeKey, NodeMemento, Displayable]):
     '''
-    ABC for classes that can make a displayable from a node key and a node memento.
+    ABC for classes that can make a `Displayable` from a `NodeKey` and a `NodeMemento`.
     '''
 
     @abstractmethod
