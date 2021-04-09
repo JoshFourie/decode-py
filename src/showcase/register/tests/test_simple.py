@@ -3,8 +3,6 @@ Tests the Simple implementations of the register ABCs.
 '''
 
 # built-in imports
-from src.showcase.register.types import DisplayableSchema
-from typing import Callable, Dict
 from typing_extensions import TypeAlias
 
 # library imports
