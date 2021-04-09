@@ -2,7 +2,7 @@ env:
 	python3 -m venv env
 
 test:
-	pytest --cov src/
+	pytest --cov-report term:skip-covered --cov-report term-missing --cov src/
 
 
 test-verbose:
