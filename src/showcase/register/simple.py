@@ -4,7 +4,7 @@ Simple register-like classes for in-memory storage.
 
 # built-in imports
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, Hashable, Union
+from typing import Any, Dict, Generic, Hashable, TypeVar, Union
 from collections import UserDict
 from enum import Enum
 
@@ -33,13 +33,19 @@ class SimpleDisplayableContext(Enum):
     Debug = 0
     Streamlit = 1
 
-class SimpleDisplayable(ABC):
+
+DisplayOutput = TypeVar('DisplayOutput')
+class SimpleDisplayable\
+(
+    Generic[DisplayOutput],
+    ABC
+):
     '''
     ABC for displayables in a Streamlit showcase.
     '''
     
     @abstractmethod
-    def display(self, context: SimpleDisplayableContext, *args: Any, **kwargs: Any) -> Any:
+    def display(self, context: SimpleDisplayableContext, *args: Any, **kwargs: Any) -> DisplayOutput:
         '''
         Displays this displayable in the context.
         '''
