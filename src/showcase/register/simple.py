@@ -117,6 +117,7 @@ class SimpleDisplayableBuilder\
 
     __displayable_template_factory: SimpleDisplayableTemplateFactory[SimpleDisplayableTemplate]
     __node_details_factory: SimpleNodeDetailsFactory
+    __displayable_template_visitor: SimpleDisplayableTemplateVisitor
 
     '''
     Property methods.
@@ -162,6 +163,26 @@ class SimpleDisplayableBuilder\
 
         return None
 
+    @property
+    def displayable_template_visitor(self) -> SimpleDisplayableTemplateVisitor:
+        '''
+        Getter for a `SimpleDisplayableVisitor`.
+        '''
+        try: return self.__displayable_template_visitor
+
+        except AttributeError as error: raise AttributeError('no simple displayable visitor attached to this instance', error)
+
+        except Exception as error: raise error
+
+    @displayable_template_visitor.setter
+    def displayable_template_visitor(self, value: SimpleDisplayableTemplateVisitor) -> None:
+        '''
+        Setter for a `SimpleDisplayVisitor`.
+        '''
+        self.__displayable_template_visitor = value
+
+        return None
+
     '''
     ABC extensions.
     '''
@@ -174,7 +195,9 @@ class SimpleDisplayableBuilder\
 
         node_details: SimpleNodeDetails = self.node_details_factory.make_details(node_memento = node_memento)
 
-        raise NotImplementedError('need to set up a display template visitor.')
+        visited_displayable_template: SimpleDisplayableTemplate = self.displayable_template_visitor.visit_displayable_template(displayable_template = displayable_template, node_details = node_details)
+
+        raise NotImplementedError('blocked until we can adapt a `SimpleDisplayableTemplate` into a `SimpleDisplayable` instance')
 
 
 class SimpleRegisterMediator\
