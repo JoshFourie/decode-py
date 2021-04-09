@@ -78,6 +78,18 @@ class NodeDetailsFactory(Generic[NodeMemento, NodeDetails], ABC):
         raise NotImplementedError
 
 
+class DisplayableTemplateVisitor(Generic[NodeDetails, DisplayableTemplate], ABC):
+    '''
+    ABC for classes that can visit a `DisplayableTemplate` instance and populate it with `NodeDetails`.
+    '''
+
+    @abstractmethod
+    def visit_displayable_template(self, displayable_template: DisplayableTemplate, node_details: NodeDetails, *args: Any, **kwargs: Any) -> DisplayableTemplate:
+        '''
+        Visits a `DisplayableTemplate` instance and populates it using the given `NodeDetails`.
+        '''
+        raise NotImplementedError
+
 class DisplayableBuilder(Generic[NodeKey, NodeMemento, Displayable]):
     '''
     ABC for classes that can make a `Displayable` from a `NodeKey` and a `NodeMemento`.
