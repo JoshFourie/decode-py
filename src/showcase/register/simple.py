@@ -15,7 +15,7 @@ class SimpleDisplayablesDatabase\
 (
     Generic[NodeKey, DisplayableSchema], 
     DisplayablesDatabase[NodeKey, DisplayableSchema],
-    UserDict[NodeKey, DisplayableSchema]
+    UserDict
 ):
     '''
     Class that can look up a display schema with a node key stored in a dict-like structure.
