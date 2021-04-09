@@ -90,6 +90,20 @@ class DisplayableTemplateVisitor(Generic[NodeDetails, DisplayableTemplate], ABC)
         '''
         raise NotImplementedError
 
+
+class DisplayableAdapter(Generic[DisplayableTemplate, Displayable], ABC):
+    '''
+    Adapts a `DisplayableTemplate` into a `Displayable`.
+    '''
+
+    @abstractmethod
+    def adapt_template(self, displayable_template: DisplayableTemplate) -> Displayable:
+        '''
+        Copies data from a `DisplayableTemplate` into a `Displayable` instance.
+        '''
+        raise NotImplementedError
+
+
 class DisplayableBuilder(Generic[NodeKey, NodeMemento, Displayable]):
     '''
     ABC for classes that can make a `Displayable` from a `NodeKey` and a `NodeMemento`.
