@@ -3,15 +3,16 @@ Simple register-like classes for in-memory storage.
 '''
 
 # built-in imports
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Any, Dict, Generic, Hashable, Union
 from collections import UserDict
+from enum import Enum
 
 from typing_extensions import TypeAlias
 
 # library imports
 from .types import DisplayableSchema, DisplayableTemplate
-from .abc import DisplayableBuilder, DisplayableTemplateFactory, DisplayableTemplateVisitor, DisplayablesDatabase, GetMemento, NodeDetailsAdapter, RegisterMediator
+from .abc import DisplayableAdapter, DisplayableBuilder, DisplayableTemplateFactory, DisplayableTemplateVisitor, DisplayablesDatabase, GetMemento, NodeDetailsAdapter, RegisterMediator
 
 
 HashableNodeKey: TypeAlias = Hashable
@@ -20,21 +21,36 @@ SimpleMemento: TypeAlias = NotImplementedError
 
 SimpleNodeDetails: TypeAlias = NotImplementedError
 
-SimpleDisplayableTemplate: TypeAlias = NotImplementedError
-
-SimpleDisplayableSchema: TypeAlias = SimpleDisplayableTemplate
-
 
 '''
 ABC things for interfacing with the `Simple*` collection.
 '''
 
+class SimpleDisplayableContext(Enum):
+    '''
+    Enum for defining the context of a `SimpleDisplayable`.
+    '''
+    Debug = 0
+    Streamlit = 1
+
 class SimpleDisplayable(ABC):
     '''
-    ABC for displayables that 
+    ABC for displayables in a Streamlit showcase.
     '''
+    
+    @abstractmethod
+    def display(self, context: SimpleDisplayableContext, *args: Any, **kwargs: Any) -> Any:
+        '''
+        Displays this displayable in the context.
+        '''
+        raise NotImplementedError
 
 
+# `Simple*` collection relies on aliasing for simplification of concrete implementations.
+
+SimpleDisplayableTemplate: TypeAlias = SimpleDisplayable
+
+SimpleDisplayableSchema: TypeAlias = SimpleDisplayableTemplate
 
 '''
 ABC extensions for defining the `Simple*` collection.
@@ -107,6 +123,19 @@ class SimpleNodeDetailsAdapter\
         raise NotImplementedError('no way to build a `SimpleNodeDetails` instance from a `SimpleMemento`')
 
 
+
+class SimpleDisplayableAdapter(DisplayableAdapter[SimpleDisplayableTemplate, SimpleDisplayable]):
+    '''
+    Class for adapting a `SimpleDisplayableTemplate` into a `SimpleDisplayable`.
+    '''
+
+    def adapt_template(self, displayable_template: SimpleDisplayableTemplate) -> SimpleDisplayable:
+        '''
+        Adapts a `SimpleDisplayableTemplate` into a `SimpleDisplayable`.
+        '''
+        return displayable_template
+
+
 class SimpleDisplayableTemplateVisitor\
 (
     DisplayableTemplateVisitor[SimpleNodeDetails, SimpleDisplayableTemplate]
@@ -133,6 +162,7 @@ class SimpleDisplayableBuilder\
     __displayable_template_factory: SimpleDisplayableTemplateFactory[SimpleDisplayableTemplate]
     __node_details_adapter: SimpleNodeDetailsAdapter
     __displayable_template_visitor: SimpleDisplayableTemplateVisitor
+    __displayable_adapter: SimpleDisplayableAdapter
 
     '''
     Property methods.
@@ -192,9 +222,29 @@ class SimpleDisplayableBuilder\
     @displayable_template_visitor.setter
     def displayable_template_visitor(self, value: SimpleDisplayableTemplateVisitor) -> None:
         '''
-        Setter for a `SimpleDisplayVisitor`.
+        Setter for a `SimpleDisplayableTemplateVisitor`.
         '''
         self.__displayable_template_visitor = value
+
+        return None
+
+    @property
+    def displayable_adapter(self) -> SimpleDisplayableAdapter:
+        '''
+        Getter for a `SimpleDisplayableAdapter`.
+        '''
+        try: return self.__displayable_adapter
+
+        except AttributeError as error: raise AttributeError('no displayable adapter attached to this instance', error)
+
+        except Exception as error: raise error
+
+    @displayable_adapter.setter
+    def displayable_adapter(self, value: SimpleDisplayableAdapter) -> None:
+        '''
+        Setter for a `SimpleDisplayableAdapter`.
+        ''' 
+        self.__displayable_adapter = value
 
         return None
 
@@ -212,8 +262,9 @@ class SimpleDisplayableBuilder\
 
         visited_displayable_template: SimpleDisplayableTemplate = self.displayable_template_visitor.visit_displayable_template(displayable_template = displayable_template, node_details = node_details)
 
-        raise NotImplementedError('blocked until we can adapt a `SimpleDisplayableTemplate` into a `SimpleDisplayable` instance')
+        displayable: SimpleDisplayable = self.displayable_adapter.adapt_template(visited_displayable_template)
 
+        return displayable
 
 class SimpleRegisterMediator\
 (
