@@ -6,22 +6,38 @@ Tests the Simple implementations of the register ABCs.
 from typing_extensions import TypeAlias
 
 # library imports
-from ..simple import SimpleDisplayableTemplateFactory, SimpleDisplayablesDatabase
+from ..simple import *
 
 
-# mock types for testing
+'''
+Mockups for testing
+'''
 
-displayable: TypeAlias = str
+MockDisplayOutput = str
 
-displayableTemplate: TypeAlias = str
+class DisplaySomething(SimpleDisplayable[MockDisplayOutput]):
+    '''
+    Class that returns a test value on calling `.display(..)`
+    '''
 
-displayableSchema: TypeAlias = str
+    def display(self, context: SimpleDisplayableContext, *args: Any, **kwargs: Any) -> MockDisplayOutput:
+        '''
+        Returns `Ok` on calling. Expects Debug context.
+        ''' 
+        assert context == SimpleDisplayableContext.Debug, 'expected Debug context, got %s' % context
 
-nodeKey: TypeAlias = str
+        return 'Ok'
 
-nodeDetails: TypeAlias = str
 
-nodeMemento: TypeAlias = str
+MockDisplayableTemplate: TypeAlias = SimpleDisplayableTemplate[str]
+
+MockDisplayableSchema: TypeAlias = SimpleDisplayableSchema[str]
+
+MockNodeKey: TypeAlias = str
+
+MockNodeDetails: TypeAlias = str
+
+MockNodeMemento: TypeAlias = str
 
 
 '''
@@ -33,16 +49,16 @@ def test_simple_display_database_userdict_semantics() -> None:
     Tests that a SimpleDisplayableDatabase is dict-like.
     '''
     # test setup
-    node_key: nodeKey = 'node_key'
+    node_key: MockNodeKey = 'node_key'
 
-    displayable_schema: displayableSchema = 'displayable_schema'
+    displayable_schema: MockDisplayableSchema = 'displayable_schema'
 
     # test instance    
-    test_instance = SimpleDisplayablesDatabase[displayableSchema]()
+    test_instance = SimpleDisplayablesDatabase[MockDisplayableSchema]()
 
     test_instance.update({ node_key : displayable_schema })
 
-    test: displayableSchema = test_instance.lookup_node(node_key)
+    test: MockDisplayableSchema = test_instance.lookup_node(node_key)
 
     assert test == displayable_schema, 'expected %s to equal %s' % (test, displayable_schema)
 
@@ -58,17 +74,17 @@ def test_simple_display_template_factory() -> None:
     Tests that `SimpleDisplayTemplateFactory` can get a template.
     '''
     # test setup
-    node_key: nodeKey = 'node_key'
+    node_key: MockNodeKey = 'node_key'
 
     ## for a simple template factory, the schema is the template
 
-    displayable_schema: displayableSchema = 'displayable_template'
+    displayable_schema: MockDisplayableSchema = 'displayable_template'
 
-    displayable_template: displayableTemplate = 'displayable_template'
+    displayable_template: MockDisplayableTemplate = 'displayable_template'
 
     # test database semantics
 
-    database = SimpleDisplayableTemplateFactory[displayableSchema]()
+    database = SimpleDisplayableTemplateFactory[MockDisplayableSchema]()
     
     database.update({ node_key : displayable_schema })
     
@@ -82,21 +98,21 @@ def test_simple_display_template_factory_from_simple_display_database() -> None:
     Tests that a `SimpleDisplayTemplateFactory` can be instantiated from a `SimpleDisplayableDatabase`
     '''
     # test setup
-    node_key: nodeKey = 'node_key'
+    node_key: MockNodeKey = 'node_key'
 
-    displayable_template: displayableTemplate = 'displayable_template'
+    displayable_template: MockDisplayableTemplate = 'displayable_template'
 
-    alt_displayable_template: displayableTemplate = 'alt_displayable_template'
+    alt_displayable_template: MockDisplayableTemplate = 'alt_displayable_template'
 
     ## get a source database
 
-    source_database = SimpleDisplayablesDatabase[displayableTemplate]()
+    source_database = SimpleDisplayablesDatabase[MockDisplayableTemplate]()
 
     source_database.update({ node_key : displayable_template })
 
     # test instance 
 
-    test_instance = SimpleDisplayableTemplateFactory[displayableTemplate]()
+    test_instance = SimpleDisplayableTemplateFactory[MockDisplayableTemplate]()
     
     test_instance.from_database(database = source_database)
 

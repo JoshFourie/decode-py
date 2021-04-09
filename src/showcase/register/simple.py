@@ -130,12 +130,12 @@ class SimpleNodeDetailsAdapter\
 
 
 
-class SimpleDisplayableAdapter(DisplayableAdapter[SimpleDisplayableTemplate, SimpleDisplayable]):
+class SimpleDisplayableAdapter(DisplayableAdapter[SimpleDisplayableTemplate[DisplayOutput], SimpleDisplayable[DisplayOutput]]):
     '''
     Class for adapting a `SimpleDisplayableTemplate` into a `SimpleDisplayable`.
     '''
 
-    def adapt_template(self, displayable_template: SimpleDisplayableTemplate) -> SimpleDisplayable:
+    def adapt_template(self, displayable_template: SimpleDisplayableTemplate[DisplayOutput]) -> SimpleDisplayable[DisplayOutput]:
         '''
         Adapts a `SimpleDisplayableTemplate` into a `SimpleDisplayable`.
         '''
@@ -144,13 +144,13 @@ class SimpleDisplayableAdapter(DisplayableAdapter[SimpleDisplayableTemplate, Sim
 
 class SimpleDisplayableTemplateVisitor\
 (
-    DisplayableTemplateVisitor[SimpleNodeDetails, SimpleDisplayableTemplate]
+    DisplayableTemplateVisitor[SimpleNodeDetails, SimpleDisplayableTemplate[DisplayOutput]]
 ):
     '''
     Class that can visit a `SimpleDisplayableTemplate` and populate it with a `SimpleNodeDetails` instance.
     '''
 
-    def visit_displayable_template(self, displayable_template: SimpleDisplayableTemplate, node_details: SimpleNodeDetails, *args: Any, **kwargs: Any) -> SimpleDisplayableTemplate:
+    def visit_displayable_template(self, displayable_template: SimpleDisplayableTemplate[DisplayOutput], node_details: SimpleNodeDetails, *args: Any, **kwargs: Any) -> SimpleDisplayableTemplate[DisplayOutput]:
         '''
         Visits a `SimpleDisplayableTemplate` instance using the given `SimpleNodeDetails`.
         '''
@@ -159,23 +159,24 @@ class SimpleDisplayableTemplateVisitor\
 
 class SimpleDisplayableBuilder\
 (
-    DisplayableBuilder[HashableNodeKey, SimpleMemento, SimpleDisplayable]
+    Generic[DisplayOutput],
+    DisplayableBuilder[HashableNodeKey, SimpleMemento, SimpleDisplayable[DisplayOutput]]
 ):
     '''
     Class that can build a `Displayable` from a `HashableNodeKey` and `SimpleMemento`
     '''
 
-    __displayable_template_factory: SimpleDisplayableTemplateFactory[SimpleDisplayableTemplate]
+    __displayable_template_factory: SimpleDisplayableTemplateFactory[SimpleDisplayableTemplate[DisplayOutput]]
     __node_details_adapter: SimpleNodeDetailsAdapter
-    __displayable_template_visitor: SimpleDisplayableTemplateVisitor
-    __displayable_adapter: SimpleDisplayableAdapter
+    __displayable_template_visitor: SimpleDisplayableTemplateVisitor[DisplayOutput]
+    __displayable_adapter: SimpleDisplayableAdapter[DisplayOutput]
 
     '''
     Property methods.
     '''
 
     @property
-    def displayable_template_factory(self) -> SimpleDisplayableTemplateFactory[SimpleDisplayableTemplate]:
+    def displayable_template_factory(self) -> SimpleDisplayableTemplateFactory[SimpleDisplayableTemplate[DisplayOutput]]:
         '''
         Getter for a `SimpleDisplayableTemplateFactory`.
         '''
@@ -186,7 +187,7 @@ class SimpleDisplayableBuilder\
         except Exception as error: raise error 
 
     @displayable_template_factory.setter
-    def displayable_template_factory(self, value: SimpleDisplayableTemplateFactory[SimpleDisplayableTemplate]) -> None:
+    def displayable_template_factory(self, value: SimpleDisplayableTemplateFactory[SimpleDisplayableTemplate[DisplayOutput]]) -> None:
         '''
         Sets an attribute for a `SimpleDisplayableTemplateFactory`.
         '''
@@ -215,7 +216,7 @@ class SimpleDisplayableBuilder\
         return None
 
     @property
-    def displayable_template_visitor(self) -> SimpleDisplayableTemplateVisitor:
+    def displayable_template_visitor(self) -> SimpleDisplayableTemplateVisitor[DisplayOutput]:
         '''
         Getter for a `SimpleDisplayableVisitor`.
         '''
@@ -226,7 +227,7 @@ class SimpleDisplayableBuilder\
         except Exception as error: raise error
 
     @displayable_template_visitor.setter
-    def displayable_template_visitor(self, value: SimpleDisplayableTemplateVisitor) -> None:
+    def displayable_template_visitor(self, value: SimpleDisplayableTemplateVisitor[DisplayOutput]) -> None:
         '''
         Setter for a `SimpleDisplayableTemplateVisitor`.
         '''
@@ -235,7 +236,7 @@ class SimpleDisplayableBuilder\
         return None
 
     @property
-    def displayable_adapter(self) -> SimpleDisplayableAdapter:
+    def displayable_adapter(self) -> SimpleDisplayableAdapter[DisplayOutput]:
         '''
         Getter for a `SimpleDisplayableAdapter`.
         '''
@@ -246,7 +247,7 @@ class SimpleDisplayableBuilder\
         except Exception as error: raise error
 
     @displayable_adapter.setter
-    def displayable_adapter(self, value: SimpleDisplayableAdapter) -> None:
+    def displayable_adapter(self, value: SimpleDisplayableAdapter[DisplayOutput]) -> None:
         '''
         Setter for a `SimpleDisplayableAdapter`.
         ''' 
@@ -258,23 +259,24 @@ class SimpleDisplayableBuilder\
     ABC extensions.
     '''
 
-    def build_displayable(self, node_key: HashableNodeKey, node_memento: SimpleMemento, *args: Any, **kwargs: Any) -> SimpleDisplayable:
+    def build_displayable(self, node_key: HashableNodeKey, node_memento: SimpleMemento, *args: Any, **kwargs: Any) -> SimpleDisplayable[DisplayOutput]:
         '''
         Builds a `Displayable` from a `HashableNodeKey` and `SimpleMemento`
         '''
-        displayable_template: SimpleDisplayableTemplate = self.displayable_template_factory.make_template(node_key = node_key)
+        displayable_template: SimpleDisplayableTemplate[DisplayOutput] = self.displayable_template_factory.make_template(node_key = node_key)
 
         node_details: SimpleNodeDetails = self.node_details_adapter.make_details(node_memento = node_memento)
 
-        visited_displayable_template: SimpleDisplayableTemplate = self.displayable_template_visitor.visit_displayable_template(displayable_template = displayable_template, node_details = node_details)
+        visited_displayable_template: SimpleDisplayableTemplate[DisplayOutput] = self.displayable_template_visitor.visit_displayable_template(displayable_template = displayable_template, node_details = node_details)
 
-        displayable: SimpleDisplayable = self.displayable_adapter.adapt_template(visited_displayable_template)
+        displayable: SimpleDisplayable[DisplayOutput] = self.displayable_adapter.adapt_template(visited_displayable_template)
 
         return displayable
 
 class SimpleRegisterMediator\
 (
-    RegisterMediator[HashableNodeKey, SimpleDisplayable]
+    Generic[DisplayOutput],
+    RegisterMediator[HashableNodeKey, SimpleDisplayable[DisplayOutput]]
 ):
     '''
     Class that can mediate between a `GetMemento[HashableNodeKey, SimpleMemento]` instance
@@ -282,7 +284,7 @@ class SimpleRegisterMediator\
     '''
 
     __mementos: GetMemento[HashableNodeKey, SimpleMemento]
-    __builder: SimpleDisplayableBuilder
+    __builder: SimpleDisplayableBuilder[DisplayOutput]
 
     '''
     Property methods.
@@ -309,7 +311,7 @@ class SimpleRegisterMediator\
         return None
 
     @property
-    def displayable_builder(self) -> SimpleDisplayableBuilder:
+    def displayable_builder(self) -> SimpleDisplayableBuilder[DisplayOutput]:
         '''
         Get a `DisplayableBuilder` for this mediator instance.
         '''
@@ -320,7 +322,7 @@ class SimpleRegisterMediator\
         except Exception as error: raise error
 
     @displayable_builder.setter
-    def displayable_builder(self, value: SimpleDisplayableBuilder) -> None:
+    def displayable_builder(self, value: SimpleDisplayableBuilder[DisplayOutput]) -> None:
         '''
         Sets an attribute for a `GetMemento` instance that can return a `SimpleMemento` from a `HashableNodeKey`.
         '''
@@ -332,12 +334,12 @@ class SimpleRegisterMediator\
     ABC extensions.
     '''
 
-    def get_displayable(self, node_key: HashableNodeKey, *args: Any, **kwarg: Any) -> SimpleDisplayable:
+    def get_displayable(self, node_key: HashableNodeKey, *args: Any, **kwarg: Any) -> SimpleDisplayable[DisplayOutput]:
         '''
         Gets a `Displayable` from a `HashableNodeKey` using a `GetMemento` class.
         '''
         node_memento: SimpleMemento = self.mementos.get_node_memento(node_key = node_key)
 
-        displayable: SimpleDisplayable = self.displayable_builder.build_displayable(node_key = node_key, node_memento = node_memento)
+        displayable: SimpleDisplayable[DisplayOutput] = self.displayable_builder.build_displayable(node_key = node_key, node_memento = node_memento)
 
         return displayable
