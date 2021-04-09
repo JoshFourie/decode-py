@@ -10,12 +10,14 @@ from typing_extensions import TypeAlias
 
 # library imports
 from .types import DisplayableSchema, DisplayableTemplate
-from .abc import DisplayableBuilder, DisplayableTemplateFactory, DisplayablesDatabase, GetMemento, RegisterMediator
+from .abc import DisplayableBuilder, DisplayableTemplateFactory, DisplayablesDatabase, GetMemento, NodeDetailsFactory, RegisterMediator
 
 
 HashableNodeKey: TypeAlias = Hashable
 
 SimpleMemento: TypeAlias = NotImplementedError
+
+SimpleNodeDetails: TypeAlias = NotImplementedError
 
 SimpleDisplayable: TypeAlias = NotImplementedError
 
@@ -75,6 +77,21 @@ class SimpleDisplayableTemplateFactory\
         return None
 
 
+class SimpleNodeDetailsFactory\
+(
+    NodeDetailsFactory[SimpleMemento, SimpleNodeDetails]
+):
+    '''
+    Class that can make a `SimpleNodeDetails` instance from a `SimpleMemento`.
+    '''
+
+    def make_details(self, node_memento: SimpleMemento, *args: Any, **kwargs: Any) -> SimpleNodeDetails:
+        '''
+        Makes a `SimpleNodeDetails` instance from the given `node_memento`.
+        '''
+        raise NotImplementedError('no way to build a `SimpleNodeDetails` instance from a `SimpleMemento`')
+
+
 class SimpleDisplayableBuilder\
 (
     DisplayableBuilder[HashableNodeKey, SimpleMemento, SimpleDisplayable]
@@ -84,6 +101,7 @@ class SimpleDisplayableBuilder\
     '''
 
     __displayable_template_factory: SimpleDisplayableTemplateFactory[SimpleDisplayableTemplate]
+    __node_details_factory: SimpleNodeDetailsFactory
 
     '''
     Property methods.
@@ -109,6 +127,26 @@ class SimpleDisplayableBuilder\
 
         return None
 
+    @property
+    def node_details_factory(self) -> SimpleNodeDetailsFactory:
+        '''
+        Getter for a `SimpleNodeDetailsFactory`.
+        '''
+        try: return self.__node_details_factory
+
+        except AttributeError as error: raise AttributeError('no node details factory attached to this instance', error)
+
+        except Exception as error: raise error 
+
+    @node_details_factory.setter
+    def node_details_factory(self, value: SimpleNodeDetailsFactory) -> None:
+        '''
+        Sets an attribute for a `SimpleNodeDetailsFactory`.
+        '''
+        self.__node_details_factory = value
+
+        return None
+
     '''
     ABC extensions.
     '''
@@ -119,7 +157,9 @@ class SimpleDisplayableBuilder\
         '''
         displayable_template: SimpleDisplayableTemplate = self.displayable_template_factory.make_template(node_key = node_key)
 
-        raise NotImplementedError('need to set up a node details factory and display template visitor.')
+        node_details: SimpleNodeDetails = self.node_details_factory.make_details(node_memento = node_memento)
+
+        raise NotImplementedError('need to set up a display template visitor.')
 
 
 class SimpleRegisterMediator\
