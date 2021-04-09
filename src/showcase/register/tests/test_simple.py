@@ -44,7 +44,7 @@ def test_simple_display_database_userdict_semantics() -> None:
     get_dict: Callable[..., Dict[nodeKey, displayableSchema]] = lambda tag: { get_key(tag) : get_value(tag) }
 
     # test instance    
-    test_instance = SimpleDisplayablesDatabase[nodeKey, displayableSchema]()
+    test_instance = SimpleDisplayablesDatabase[displayableSchema]()
 
     for i in range(3): 
         tag: str = str(i)
@@ -59,7 +59,6 @@ def test_simple_display_database_userdict_semantics() -> None:
 
         test: displayableSchema = test_instance.lookup_node(key)
 
-        assert test is not None, 'expected test value to not be a None'
         assert test == exp, 'expected %s to equal %s' % (test, exp)
 
     return None
