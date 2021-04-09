@@ -3,17 +3,101 @@ Simple register-like classes for in-memory storage.
 '''
 
 # built-in imports
-from typing import Any, Generic, Hashable, Union
+from typing import Any, Dict, Generic, Hashable, Union
 from collections import UserDict
 
 from typing_extensions import TypeAlias
 
 # library imports
-from .types import DisplayableSchema, DisplayableTemplate
-from .abc import DisplayableTemplateFactory, DisplayablesDatabase
+from .types import Displayable, DisplayableSchema, DisplayableTemplate, NodeMemento
+from .abc import DisplayableBuilder, DisplayableTemplateFactory, DisplayablesDatabase, GetMemento, RegisterMediator
 
 
 HashableNodeKey: TypeAlias = Hashable
+
+SimpleMemento: TypeAlias = NotImplementedError
+
+SimpleDisplayable: TypeAlias = NotImplementedError
+
+SimpleDisplayableTemplate: TypeAlias = NotImplementedError
+
+SimpleDisplayableSchema: TypeAlias = SimpleDisplayableTemplate
+
+SimpleDisplayableBuilder: TypeAlias = DisplayableBuilder[HashableNodeKey, SimpleMemento, SimpleDisplayable]
+
+
+class SimpleRegisterMediator\
+(
+    RegisterMediator[HashableNodeKey, SimpleDisplayable]
+):
+    '''
+    Class that can mediate between a `GetMemento[HashableNodeKey, SimpleMemento]` instance
+    and a `SimpleDisplayBuilder` to get a `SimpleDisplayable` from a `HashableNodeKey`.
+    '''
+
+    __mementos: GetMemento[HashableNodeKey, SimpleMemento]
+    __builder: SimpleDisplayableBuilder
+
+    '''
+    Property methods.
+    '''
+
+    @property
+    def mementos(self) -> GetMemento[HashableNodeKey, SimpleMemento]:
+        '''
+        Getter for a `GetMemento` instance that can return a `SimpleMemento` from a `HashableNodeKey`.
+        '''
+        try: return self.__mementos
+
+        except AttributeError as error: raise AttributeError('no computation graph holding simple mementos attached to this instance', error)
+
+        except Exception as error: raise error 
+
+    @mementos.setter
+    def mementos(self, value: GetMemento[HashableNodeKey, SimpleMemento]) -> None:
+        '''
+        Sets an attribute for a `GetMemento` instance that can return a `SimpleMemento` from a `HashableNodeKey`.
+        '''
+        self.__mementos = value
+
+        return None
+
+    @property
+    def displayable_builder(self) -> SimpleDisplayableBuilder:
+        '''
+        Get a `DisplayableBuilder` for this mediator instance.
+        '''
+        try: return self.__builder
+
+        except AttributeError as error: raise AttributeError('no display builder attached to this instance', error)
+
+        except Exception as error: raise error
+
+    @displayable_builder.setter
+    def displayable_builder(self, value: SimpleDisplayableBuilder) -> None:
+        '''
+        Sets an attribute for a `GetMemento` instance that can return a `SimpleMemento` from a `HashableNodeKey`.
+        '''
+        self.__builder = value
+
+        return None
+
+    '''
+    ABC extensions.
+    '''
+
+    def get_displayable(self, node_key: HashableNodeKey, *args: Any, **kwarg: Any) -> SimpleDisplayable:
+        '''
+        Gets a `Displayable` from a `HashableNodeKey` using a `GetMemento` class.
+        '''
+        node_memento: SimpleMemento = self.mementos.get_node_memento(node_key = node_key)
+
+        displayable_builder: SimpleDisplayableBuilder = self.displayable_builder.build_displayable(node_key = node_key, node_memento = node_memento)
+
+        raise NotImplementedError('still require a concrete `SimpleDisplayBuilder` class to map a `SimpleNodeMemento` to a `Displayable`')
+
+        return displayable_builder
+
 
 class SimpleDisplayablesDatabase\
 (
@@ -22,7 +106,7 @@ class SimpleDisplayablesDatabase\
     UserDict # type checks sometimes think this needs type arguments but that is a syntax error
 ):
     '''
-    Class that can look up a display schema with a node key stored in a dict-like structure.
+    Class that can look up a `SimpleDisplayableSchema` with a `HashableNodeKey` stored in a dict-like structure.
     '''
 
     def lookup_node(self, node_key: HashableNodeKey, *args: Any, **kwargs: Any) -> DisplayableSchema:
@@ -55,3 +139,13 @@ class SimpleDisplayableTemplateFactory\
         the given `NodeKey`.
         '''
         return self.lookup_node(node_key)
+
+    def from_database(self, database: SimpleDisplayablesDatabase[DisplayableTemplate]) -> None:
+        '''
+        Stores a reference to the data in a `SimpleDisplayablesDatabase` to this instance.
+        '''
+        data: Dict[HashableNodeKey, DisplayableTemplate] = database.data
+
+        self.data = data
+
+        return None
