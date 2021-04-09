@@ -9,7 +9,7 @@ from collections import UserDict
 from typing_extensions import TypeAlias
 
 # library imports
-from .types import Displayable, DisplayableSchema, DisplayableTemplate, NodeMemento
+from .types import DisplayableSchema, DisplayableTemplate
 from .abc import DisplayableBuilder, DisplayableTemplateFactory, DisplayablesDatabase, GetMemento, RegisterMediator
 
 
@@ -82,7 +82,33 @@ class SimpleDisplayableBuilder\
     '''
     Class that can build a `Displayable` from a `HashableNodeKey` and `SimpleMemento`
     '''
-    
+
+    __displayable_template_factory: SimpleDisplayableTemplateFactory[SimpleDisplayableTemplate]
+
+    '''
+    Property methods.
+    '''
+
+    @property
+    def displayable_template_factory(self) -> SimpleDisplayableTemplateFactory[SimpleDisplayableTemplate]:
+        '''
+        Getter for a `SimpleDisplayableTemplateFactory`.
+        '''
+        try: return self.__displayable_template_factory
+
+        except AttributeError as error: raise AttributeError('no displayable template factory attached to this instance', error)
+
+        except Exception as error: raise error 
+
+    @displayable_template_factory.setter
+    def displayable_template_factory(self, value: SimpleDisplayableTemplateFactory[SimpleDisplayableTemplate]) -> None:
+        '''
+        Sets an attribute for a `SimpleDisplayableTemplateFactory`.
+        '''
+        self.__displayable_template_factory = value
+
+        return None
+
     '''
     ABC extensions.
     '''
@@ -91,10 +117,9 @@ class SimpleDisplayableBuilder\
         '''
         Builds a `Displayable` from a `HashableNodeKey` and `SimpleMemento`
         '''
-        # display_template: SimpleDisplayableTemplate 
-        raise NotImplementedError('require property methods to get the underlying components.')
+        displayable_template: SimpleDisplayableTemplate = self.displayable_template_factory.make_template(node_key = node_key)
 
-
+        raise NotImplementedError('need to set up a node details factory and display template visitor.')
 
 
 class SimpleRegisterMediator\
