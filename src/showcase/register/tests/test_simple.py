@@ -152,3 +152,58 @@ def test_simple_display_template_factory_from_simple_display_database() -> None:
     assert test == alt_displayable_template, 'expected to copy a reference to data from a mutable source database'
 
     return None
+
+
+'''
+Unit tests for `SimpleNodeDetailsAdapter`
+'''
+
+def test_simple_node_details_adapter() -> None:
+    '''
+    Tests that a `SimpleNodeDetailsAdapter` can build a `SimpleNodeDetails` from a `SimpleMemento`.
+    '''
+    raise NotImplementedError('requires a simple node memento implementation')
+
+
+'''
+Unit tests for `SimpleDisplayableAdapter`
+'''
+
+def test_simple_displayable_adapter() -> None:
+    '''
+    Tests that a `SimpleDisplayableAdapter` is a no-op.
+    '''
+    raise NotImplementedError('unblocked but not yet implemented')
+
+
+'''
+Unit tests for `SimpleDisplayableTemplateVisitor`.
+'''
+
+def test_simple_displayable_template_visitor() -> None:
+    '''
+    Tests that a `SimpleDisplayableTemplateVisitor` can visit a `SimpleDisplayableTemplate`.
+    '''
+    raise NotImplementedError('requires simple visitor design decision')
+
+
+'''
+Unit tests for `SimpleDisplayBuilder`
+'''
+
+def test_simple_displayable_builder() -> None:
+    '''
+    Tests that a `SimpleDisplayableBuilder` can build a `SimpleDisplayable`.
+    '''
+    raise NotImplementedError('requires a node memento implementation')
+
+
+'''
+Unit tests for `SimpleRegisterMediator`
+'''
+
+def test_simple_register_mediator() -> None:
+    '''
+    Tests that a `SimpleRegisterMediator` can make a `SimpleDisplayable`
+    '''
+    raise NotImplementedError('requires a node memento implementation')
