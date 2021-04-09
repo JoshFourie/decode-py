@@ -65,7 +65,7 @@ class DisplayableTemplateFactory(Generic[NodeKey, DisplayableTemplate], ABC):
         raise NotImplementedError
 
 
-class NodeDetailsFactory(Generic[NodeMemento, NodeDetails], ABC):
+class NodeDetailsAdapter(Generic[NodeMemento, NodeDetails], ABC):
     '''
     ABC for classes that can make `NodeDetails` from a `NodeMemento`.
     '''

@@ -3,6 +3,7 @@ Simple register-like classes for in-memory storage.
 '''
 
 # built-in imports
+from abc import ABC
 from typing import Any, Dict, Generic, Hashable, Union
 from collections import UserDict
 
@@ -10,7 +11,7 @@ from typing_extensions import TypeAlias
 
 # library imports
 from .types import DisplayableSchema, DisplayableTemplate
-from .abc import DisplayableBuilder, DisplayableTemplateFactory, DisplayableTemplateVisitor, DisplayablesDatabase, GetMemento, NodeDetailsFactory, RegisterMediator
+from .abc import DisplayableBuilder, DisplayableTemplateFactory, DisplayableTemplateVisitor, DisplayablesDatabase, GetMemento, NodeDetailsAdapter, RegisterMediator
 
 
 HashableNodeKey: TypeAlias = Hashable
@@ -19,11 +20,25 @@ SimpleMemento: TypeAlias = NotImplementedError
 
 SimpleNodeDetails: TypeAlias = NotImplementedError
 
-SimpleDisplayable: TypeAlias = NotImplementedError
-
 SimpleDisplayableTemplate: TypeAlias = NotImplementedError
 
 SimpleDisplayableSchema: TypeAlias = SimpleDisplayableTemplate
+
+
+'''
+ABC things for interfacing with the `Simple*` collection.
+'''
+
+class SimpleDisplayable(ABC):
+    '''
+    ABC for displayables that 
+    '''
+
+
+
+'''
+ABC extensions for defining the `Simple*` collection.
+'''
 
 class SimpleDisplayablesDatabase\
 (
@@ -77,9 +92,9 @@ class SimpleDisplayableTemplateFactory\
         return None
 
 
-class SimpleNodeDetailsFactory\
+class SimpleNodeDetailsAdapter\
 (
-    NodeDetailsFactory[SimpleMemento, SimpleNodeDetails]
+    NodeDetailsAdapter[SimpleMemento, SimpleNodeDetails]
 ):
     '''
     Class that can make a `SimpleNodeDetails` instance from a `SimpleMemento`.
@@ -116,7 +131,7 @@ class SimpleDisplayableBuilder\
     '''
 
     __displayable_template_factory: SimpleDisplayableTemplateFactory[SimpleDisplayableTemplate]
-    __node_details_factory: SimpleNodeDetailsFactory
+    __node_details_adapter: SimpleNodeDetailsAdapter
     __displayable_template_visitor: SimpleDisplayableTemplateVisitor
 
     '''
@@ -144,22 +159,22 @@ class SimpleDisplayableBuilder\
         return None
 
     @property
-    def node_details_factory(self) -> SimpleNodeDetailsFactory:
+    def node_details_adapter(self) -> SimpleNodeDetailsAdapter:
         '''
         Getter for a `SimpleNodeDetailsFactory`.
         '''
-        try: return self.__node_details_factory
+        try: return self.__node_details_adapter
 
         except AttributeError as error: raise AttributeError('no node details factory attached to this instance', error)
 
         except Exception as error: raise error 
 
-    @node_details_factory.setter
-    def node_details_factory(self, value: SimpleNodeDetailsFactory) -> None:
+    @node_details_adapter.setter
+    def node_details_adapter(self, value: SimpleNodeDetailsAdapter) -> None:
         '''
         Sets an attribute for a `SimpleNodeDetailsFactory`.
         '''
-        self.__node_details_factory = value
+        self.__node_details_adapter = value
 
         return None
 
@@ -193,7 +208,7 @@ class SimpleDisplayableBuilder\
         '''
         displayable_template: SimpleDisplayableTemplate = self.displayable_template_factory.make_template(node_key = node_key)
 
-        node_details: SimpleNodeDetails = self.node_details_factory.make_details(node_memento = node_memento)
+        node_details: SimpleNodeDetails = self.node_details_adapter.make_details(node_memento = node_memento)
 
         visited_displayable_template: SimpleDisplayableTemplate = self.displayable_template_visitor.visit_displayable_template(displayable_template = displayable_template, node_details = node_details)
 
