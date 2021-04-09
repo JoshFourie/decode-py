@@ -10,7 +10,7 @@ from typing_extensions import TypeAlias
 
 # library imports
 from .types import DisplayableSchema, DisplayableTemplate
-from .abc import DisplayableBuilder, DisplayableTemplateFactory, DisplayablesDatabase, GetMemento, NodeDetailsFactory, RegisterMediator
+from .abc import DisplayableBuilder, DisplayableTemplateFactory, DisplayableTemplateVisitor, DisplayablesDatabase, GetMemento, NodeDetailsFactory, RegisterMediator
 
 
 HashableNodeKey: TypeAlias = Hashable
@@ -90,6 +90,21 @@ class SimpleNodeDetailsFactory\
         Makes a `SimpleNodeDetails` instance from the given `node_memento`.
         '''
         raise NotImplementedError('no way to build a `SimpleNodeDetails` instance from a `SimpleMemento`')
+
+
+class SimpleDisplayableTemplateVisitor\
+(
+    DisplayableTemplateVisitor[SimpleNodeDetails, SimpleDisplayableTemplate]
+):
+    '''
+    Class that can visit a `SimpleDisplayableTemplate` and populate it with a `SimpleNodeDetails` instance.
+    '''
+
+    def visit_displayable_template(self, displayable_template: SimpleDisplayableTemplate, node_details: SimpleNodeDetails, *args: Any, **kwargs: Any) -> SimpleDisplayableTemplate:
+        '''
+        Visits a `SimpleDisplayableTemplate` instance using the given `SimpleNodeDetails`.
+        '''
+        raise NotImplementedError('blocked until `SimpleDisplayableTemplate` and `SimpleNodeDetails` are implemented')
 
 
 class SimpleDisplayableBuilder\
