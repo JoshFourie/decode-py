@@ -15,7 +15,7 @@ class SimpleDisplayablesDatabase\
 (
     Generic[NodeKey, DisplayableSchema], 
     DisplayablesDatabase[NodeKey, DisplayableSchema],
-    UserDict
+    UserDict # type checks sometimes think this needs type arguments but that is a syntax error
 ):
     '''
     Class that can look up a display schema with a node key stored in a dict-like structure.

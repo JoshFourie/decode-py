@@ -57,7 +57,7 @@ def test_simple_display_database_userdict_semantics() -> None:
         key: nodeKey = get_key(tag)
         exp: displayableSchema = get_value(tag)
 
-        test: displayableSchema = test_instance.get(key)
+        test: displayableSchema = test_instance.lookup_node(key)
 
         assert test is not None, 'expected test value to not be a None'
         assert test == exp, 'expected %s to equal %s' % (test, exp)
