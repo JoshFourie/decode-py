@@ -76,3 +76,8 @@ def test_simple_display_template_factory() -> None:
 
     assert database.make_template(node_key) == displayable_template
 
+
+# def test_simple_display_template_factory_from_simple_display_database() -> None:
+#     '''
+#     Tests that 
+#     '''
