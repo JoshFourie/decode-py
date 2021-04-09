@@ -266,8 +266,6 @@ class SimpleRegisterMediator\
         '''
         node_memento: SimpleMemento = self.mementos.get_node_memento(node_key = node_key)
 
-        displayable_builder: SimpleDisplayableBuilder = self.displayable_builder.build_displayable(node_key = node_key, node_memento = node_memento)
+        displayable: SimpleDisplayable = self.displayable_builder.build_displayable(node_key = node_key, node_memento = node_memento)
 
-        raise NotImplementedError('still require a concrete `SimpleDisplayBuilder` class to map a `SimpleNodeMemento` to a `Displayable`')
-
-        return displayable_builder
+        return displayable
