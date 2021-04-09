@@ -27,7 +27,6 @@ class SimpleDisplayablesDatabase\
 
     def lookup_node(self, node_key: HashableNodeKey, *args: Any, **kwargs: Any) -> DisplayableSchema:
         '''
-        raise NotImplementedError('require an adapter for the schema to become a template')
         Looks up the node key in a dict-like structure.
 
         Throws a `KeyError` if the key node key is not in the dict.
