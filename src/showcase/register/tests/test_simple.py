@@ -104,6 +104,7 @@ def test_simple_display_template_factory_from_simple_display_database() -> None:
 
     test = test_instance.lookup_node(node_key = node_key)
 
+
     assert test == displayable_template, 'expected to copy data from source database'
 
     ## does a test instance copy a reference to the source data?
