@@ -8,7 +8,7 @@ from typing import Callable, Dict
 from typing_extensions import TypeAlias
 
 # library imports
-from ..simple import SimpleDisplayablesDatabase
+from ..simple import SimpleDisplayableTemplateFactory, SimpleDisplayablesDatabase
 
 
 # mock types for testing
@@ -36,29 +36,18 @@ def test_simple_display_database_userdict_semantics() -> None:
     '''
     # test setup
     node_key: nodeKey = 'node_key'
+
     displayable_schema: displayableSchema = 'displayable_schema'
-
-    get_key: Callable[..., nodeKey] = lambda tag: node_key + tag
-    get_value: Callable[..., displayableSchema] = lambda tag: displayable_schema + tag
-
-    get_dict: Callable[..., Dict[nodeKey, displayableSchema]] = lambda tag: { get_key(tag) : get_value(tag) }
 
     # test instance    
     test_instance = SimpleDisplayablesDatabase[displayableSchema]()
 
-    for i in range(3): 
-        tag: str = str(i)
-        update: Dict[nodeKey, nodeMemento] = get_dict(tag)
-        test_instance.update(update)
+    test_instance.update({ node_key : displayable_schema })
 
-    # test assertions
-    for i in range(3):
-        tag: str = str(i)
-        key: nodeKey = get_key(tag)
-        exp: displayableSchema = get_value(tag)
+    test: displayableSchema = test_instance.lookup_node(node_key)
 
-        test: displayableSchema = test_instance.lookup_node(key)
-
-        assert test == exp, 'expected %s to equal %s' % (test, exp)
+    assert test == displayable_schema, 'expected %s to equal %s' % (test, displayable_schema)
 
     return None
+
+
