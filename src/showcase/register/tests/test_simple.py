@@ -51,3 +51,30 @@ def test_simple_display_database_userdict_semantics() -> None:
     return None
 
 
+'''
+Unit tests for SimpleDisplayTemplateFactory.
+'''
+
+def test_simple_display_template_factory() -> None:
+    '''
+    Tests that SimpleDisplayTemplateFactory can get a template.
+    '''
+    # test setup
+    node_key: nodeKey = 'node_key'
+
+    ## for a simple template factory, the schema is the template
+
+    displayable_schema: displayableSchema = 'displayable_template'
+
+    displayable_template: displayableTemplate = 'displayable_template'
+
+    # test database semantics
+
+    database = SimpleDisplayableTemplateFactory[displayableSchema]()
+    
+    database.update({ node_key : displayable_schema })
+    
+    assert database.lookup_node(node_key) == displayable_schema
+
+    assert database.make_template(node_key) == displayable_template
+
