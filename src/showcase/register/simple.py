@@ -17,9 +17,6 @@ from .abc import DisplayableAdapter, DisplayableBuilder, DisplayableTemplateFact
 
 HashableNodeKey: TypeAlias = Hashable
 
-SimpleMemento: TypeAlias = NotImplementedError
-
-SimpleNodeDetails: TypeAlias = NotImplementedError
 
 
 '''
@@ -35,6 +32,7 @@ class SimpleDisplayableContext(Enum):
 
 
 DisplayOutput = TypeVar('DisplayOutput')
+
 class SimpleDisplayable\
 (
     Generic[DisplayOutput],
@@ -50,6 +48,14 @@ class SimpleDisplayable\
         Displays this displayable in the context.
         '''
         raise NotImplementedError
+        
+
+class SimpleMemento(ABC):
+    '''
+    ABC for classes that are a memento. 
+    '''
+    pass
+
 
 
 # `Simple*` collection relies on aliasing for simplification of concrete implementations.
@@ -57,6 +63,8 @@ class SimpleDisplayable\
 SimpleDisplayableTemplate: TypeAlias = SimpleDisplayable
 
 SimpleDisplayableSchema: TypeAlias = SimpleDisplayableTemplate
+
+SimpleNodeDetails: TypeAlias = SimpleMemento
 
 '''
 ABC extensions for defining the `Simple*` collection.
@@ -98,8 +106,7 @@ class SimpleDisplayableTemplateFactory\
     
     def make_template(self, node_key: HashableNodeKey, *args: Any, **kwargs: Any) -> DisplayableTemplate:
         '''
-        Makes a `DisplayableTemplate` by adapting a `DisplayableSchema` associated with 
-        the given `NodeKey`.
+        Makes a `DisplayableTemplate` by looking up a `DisplayableSchema` from a `NodeKey`.
         '''
         return self.lookup_node(node_key)
 
@@ -122,12 +129,11 @@ class SimpleNodeDetailsAdapter\
     Class that can make a `SimpleNodeDetails` instance from a `SimpleMemento`.
     '''
 
-    def make_details(self, node_memento: SimpleMemento, *args: Any, **kwargs: Any) -> SimpleNodeDetails:
+    def adapt_memento(self, node_memento: SimpleMemento, *args: Any, **kwargs: Any) -> SimpleNodeDetails:
         '''
         Makes a `SimpleNodeDetails` instance from the given `node_memento`.
         '''
         raise NotImplementedError('no way to build a `SimpleNodeDetails` instance from a `SimpleMemento`')
-
 
 
 class SimpleDisplayableAdapter(DisplayableAdapter[SimpleDisplayableTemplate[DisplayOutput], SimpleDisplayable[DisplayOutput]]):
@@ -265,13 +271,14 @@ class SimpleDisplayableBuilder\
         '''
         displayable_template: SimpleDisplayableTemplate[DisplayOutput] = self.displayable_template_factory.make_template(node_key = node_key)
 
-        node_details: SimpleNodeDetails = self.node_details_adapter.make_details(node_memento = node_memento)
+        node_details: SimpleNodeDetails = self.node_details_adapter.adapt_memento(node_memento = node_memento)
 
         visited_displayable_template: SimpleDisplayableTemplate[DisplayOutput] = self.displayable_template_visitor.visit_displayable_template(displayable_template = displayable_template, node_details = node_details)
 
         displayable: SimpleDisplayable[DisplayOutput] = self.displayable_adapter.adapt_template(visited_displayable_template)
 
         return displayable
+
 
 class SimpleRegisterMediator\
 (
@@ -317,7 +324,7 @@ class SimpleRegisterMediator\
         '''
         try: return self.__builder
 
-        except AttributeError as error: raise AttributeError('no display builder attached to this instance', error)
+        except AttributeError as error: raise AttributeError('no displayable builder attached to this instance', error)
 
         except Exception as error: raise error
 
