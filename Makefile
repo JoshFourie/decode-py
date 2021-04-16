@@ -2,7 +2,8 @@ env:
 	python3 -m venv env
 
 test:
-	pytest
+	pytest --cov src/
+
 
 test-verbose:
 	pytest -s --capture=no --full-trace
