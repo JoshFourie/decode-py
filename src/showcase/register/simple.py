@@ -66,24 +66,48 @@ class SimpleDatabaseProxyConnector\
 
     __database: SimpleDatabaseConnection[DatabaseLookupValue]
 
+    '''
+    Dunder and property methods.
+    '''
+
+    def __init__(self, connection: SimpleDatabaseConnection[DatabaseLookupValue], *args: Any, **kwargs: Any) -> None:
+        '''
+        Calls the parent classes and sets the private database connection field to `None`.
+        '''
+        super().__init__(*args, **kwargs)
+
+        self.__database = connection
+
+        return None
+
     @property
-    def database(self) -> SimpleDatabaseConnection[DatabaseLookupValue]:
+    def __database_connection__(self) -> SimpleDatabaseConnection[DatabaseLookupValue]:
         '''
         Property method for getting a `SimpleDatabaseConnection` associated with this instance.
         '''
         try: return self.__database
 
-        except AttributeError: raise AttributeError('<%s>.database does not have a connection to a database, try setting the `.database` property.' % self.__class__.__name__) 
+        except AttributeError: raise AttributeError('<%s> does not have a database connection, try setting one.')
 
-    @database.setter
-    def database(self, connection: SimpleDatabaseConnection[DatabaseLookupValue]) -> None:
+    '''
+    ABC extensions.
+    '''
+
+    def connect_database(self, connection: SimpleDatabaseConnection[DatabaseLookupValue]) -> None:
         '''
-        Property method for setting a `SimpleDatabaseConnection` to this instance.
+        Connects this instance to a `SimpleDatabaseConnection` by setting a private field to `connection`.
         '''
         self.__database = connection
 
         return None
 
+    def disconnect_database(self) -> None:
+        '''
+        Disconnects this instance from a `SimpleDatabaseConnection` by setting a private field to `None`.
+        '''
+        del self.__database
+
+        return None
 
 class SimpleGenericDatabaseProxyWriter\
 (
@@ -99,8 +123,8 @@ class SimpleGenericDatabaseProxyWriter\
     def write_memento(self, node_key: SimpleKey, node_memento: Displayable, *args: Any, **kwargs: Any) -> None:
         '''
         Writes a `NodeMemento` to a `SimpleDatabaseConnection` against a `NodeKey`.
-        '''
-        self.database.write(key = node_key, value = node_memento)
+        '''        
+        self.__database_connection__.write(key = node_key, value = node_memento)
 
         return None
 
@@ -127,7 +151,7 @@ class SimpleGenericDatabaseProxyLoader\
         '''
         Loads a `Displayable` from a `SimpleDatabaseConnection` using a `SimpleKey`.
         '''
-        return self.database.load(key = node_key)
+        return self.__database_connection__.load(key = node_key)
 
 
     def load_schema(self, schema_key: SimpleKey, *args: Any, **kwargs: Any) -> Displayable:
@@ -141,30 +165,52 @@ class SimpleDisplayableBuilder\
 (
     Generic[Displayable],
     DisplayableBuilder[SimpleKey, None, Displayable],
-    SimpleGenericDatabaseProxyLoader[Displayable]
 ):
     '''
     Class that can build a `Displayable` from a `SimpleKey` using a `SimpleGenericDatabaseConnection`
     '''
 
+    __loader: SimpleGenericDatabaseProxyLoader[Displayable]
+
+    def __init__(self, loader: SimpleGenericDatabaseProxyLoader[Displayable], *args: Any, **kwargs: Any) -> None:
+        '''
+        Sets up a connection to a `SimpleGenericDatabaseProxyLoader` and calls the superclass.
+        '''
+        super().__init__(*args, **kwargs)
+
+        self.__loader = loader
+
+        return None
+
     def build_displayable(self, schema_key: SimpleKey, node_memento: None = None, *args: Any, **kwargs: Any) -> Displayable:
         '''
         Gets a `Displayable` from a `SimpleGenericDatabaseConnection` using this `SimpleKey`.
         '''
-        return self.load_schema(schema_key = schema_key)
+        return self.__loader.load_schema(schema_key = schema_key)
 
 
 class SimpleDisplayableMediator\
 (
-    Generic[Displayable],
-    SimpleDisplayableBuilder[Displayable]
+    Generic[Displayable]
 ):
     '''
     Class that can get a `Displayable` using a `SimpleKey`.
     '''
 
+    __builder: SimpleDisplayableBuilder[Displayable]
+
+    def __init__(self, database: SimpleDatabaseConnection[Displayable], *args: Any, **kwargs: Any) -> None:
+        '''
+        Calls the super classes and sets up a `SimpleDisplayableBuilder`
+        '''
+        loader: SimpleGenericDatabaseProxyLoader[Displayable] = SimpleGenericDatabaseProxyLoader(connection = database)
+
+        self.__builder = SimpleDisplayableBuilder(loader = loader)
+
+        return None
+
     def get_displayable(self, key: SimpleKey) -> Displayable:
         '''
         Gets a `Displayable` using a `SimpleKey`.
         '''
-        return self.build_displayable(schema_key = key)
+        return self.__builder.build_displayable(schema_key = key)

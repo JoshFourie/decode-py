@@ -38,21 +38,19 @@ class GenericDatabaseConnector(Generic[DatabaseConnection], ABC):
     ABC for classes that can open or return a connection to `GenericDatabase` type from a `.database` property.
     '''
 
-    @property
     @abstractmethod
-    def database(self) -> DatabaseConnection:
+    def connect_database(self, connection: DatabaseConnection) -> None:
         '''
-        Property method for getting a `DatabaseConnection` associated with this instance.
+        Connects this instance to a `DatabaseConnection`.
         '''
-        raise NotImplementedError('%s requires a `.database` property getter method.' % GenericDatabaseConnector.__name__)
+        raise NotImplementedError('%s requires a `.connect_database(..)` abstract method.' % GenericDatabaseConnector.__name__)
 
-    @database.setter
     @abstractmethod
-    def database(self, connection: DatabaseConnection) -> None:
+    def disconnect_database(self) -> None:
         '''
-        Property method for setting a `DatabaseConnection` to this instance.
+        Disconnects this instance from the current `DatabaseConnection`.
         '''
-        raise NotImplementedError('%s requires a `.database` property setter method.' % GenericDatabaseConnector.__name__)
+        raise NotImplementedError('%s requires a `.database` abstract method.' % GenericDatabaseConnector.__name__)
 
 
 class NodeMementoCaretakerProxyWriter(Generic[NodeKey, NodeMemento], ABC):

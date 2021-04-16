@@ -65,37 +65,26 @@ def test_simple_generic_database_proxy_connector() -> None:
 
     database: SimpleGenericDatabase[MockDisplayable] = SimpleGenericDatabase()
 
-    proxy: SimpleDatabaseProxyConnector[MockDisplayable] = SimpleDatabaseProxyConnector()
+    proxy: SimpleDatabaseProxyConnector[MockDisplayable] = SimpleDatabaseProxyConnector(connection = database)
 
-    # try get a bad property
+    # try set a new connection
 
-    try: 
-        proxy.database
+    try: proxy.connect_database(connection = database)
 
-        raise AssertionError('expected <%s>.database getter to throw an error on an empty database connection.' % SimpleDatabaseProxyConnector.__name__)
+    except Exception as error: raise Exception('<%s>.connect_database(..) threw an unexpected error.', error)
 
-    except AttributeError: pass # test passed
+    # try disconnect a connection
 
-    # try set a valid property
+    try: proxy.disconnect_database()
 
-    try: proxy.database = database
-
-    except Exception as error: raise AssertionError('<%s>.database setter threw an unexpected error.', error)
-
-    # try get a valid property
-
-    assert proxy.database == database, 'expected <%s>.database to return the connected database.' % SimpleDatabaseProxyConnector.__name__
+    except Exception as error: raise Exception('<%s>.disconnect_database(..) threw an unexpected error.', error)
 
     # pylance should protect against bad settings with a squiggly line of doom: the pythonic way is to ask for forgiveness...
 
-    proxy.database = 'BadConnection'
+    proxy.connect_database(connection = 'BadConnection')
 
     proxy._SimpleDatabaseProxyConnector__database = 'SomeoneToldMeToOverridePrivateProperties'
 
-    bad_database: SimpleDatabaseConnection[MockDisplayable] = proxy.database
-
-    assert not isinstance(bad_database, SimpleDatabaseConnection), 'expected <%s>.database to have returned a bad database connection on a bad connection setting.' % SimpleDatabaseProxyConnector.__name__
-    
     # all tests passed
 
     return None
@@ -109,9 +98,7 @@ def test_simple_proxy_writer() -> None:
 
     database: SimpleGenericDatabase[MockDisplayable] = SimpleGenericDatabase()
 
-    proxy: SimpleGenericDatabaseProxyWriter[MockDisplayable] = SimpleGenericDatabaseProxyWriter()
-
-    proxy.database = database
+    proxy: SimpleGenericDatabaseProxyWriter[MockDisplayable] = SimpleGenericDatabaseProxyWriter(connection = database)
 
     node_key: MockSimpleKey = 'NodeKey'; node_memento: MockDisplayable = 'NodeMemento'
 
@@ -138,9 +125,7 @@ def test_simple_proxy_loader() -> None:
 
     database.write(key = node_key, value = node_memento)
 
-    proxy: SimpleGenericDatabaseProxyLoader[MockDisplayable] = SimpleGenericDatabaseProxyLoader()
-
-    proxy.database = database
+    proxy: SimpleGenericDatabaseProxyLoader[MockDisplayable] = SimpleGenericDatabaseProxyLoader(connection = database)
 
     # try load
 
@@ -172,9 +157,7 @@ def test_simple_displayable_mediator() -> None:
 
     # get a mediator
 
-    mediator: SimpleDisplayableMediator[MockDisplayable] = SimpleDisplayableMediator()
-
-    mediator.database = database
+    mediator: SimpleDisplayableMediator[MockDisplayable] = SimpleDisplayableMediator(database = database)
 
     # try load a displayable.
 
