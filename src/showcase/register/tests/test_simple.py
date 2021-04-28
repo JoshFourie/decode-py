@@ -47,7 +47,7 @@ def test_simple_generic_database_integration() -> None:
     try: 
         database.load('BadNodeKey')
         
-        raise AssertionError('expected <%s>.load(..) to throw a KeyError type on a bad key selection.' % SimpleGenericDatabase.__name__)
+        raise AssertionError('expected <%s>.load(..) to throw a KeyError type on a bad key selection.' % SimpleGenericDatabase.__name__) # pragma: no cover 
 
     except KeyError: pass # test passed
 
@@ -88,7 +88,7 @@ def test_simple_displayable_mediator() -> None:
     try: 
         test: MockDisplayable = mediator.get_displayable(key = 'BadKey')
 
-        raise AssertionError('expected that <%s>.get_displayable(..) would throw a key error on a bad key.' % SimpleDisplayableMediator.__name__)
+        raise AssertionError('expected that <%s>.get_displayable(..) would throw a key error on a bad key.' % SimpleDisplayableMediator.__name__) # pragma: no cover 
 
     except KeyError: pass # check passed
 
