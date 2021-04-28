@@ -34,7 +34,7 @@ def test_simple_generic_database_integration() -> None:
     # write to database
     database.write(mock_key, mock_memento)
 
-    assert database.data == {mock_key : mock_memento}, 'expected <%s>.write(..) to update a `UserDict`.' % SimpleGenericDatabase.__name__
+    assert database.data == {mock_key : mock_memento}, 'expected <%s>.write(..) to update a `UserDict`.' % SimpleGenericDatabase.__name__ # type: ignore unknown member type
 
     # try load with a good key
 
@@ -71,7 +71,7 @@ def test_simple_displayable_mediator() -> None:
 
     simple_key: MockSimpleKey = 'SimpleKey'; displayable: MockDisplayable = 'Displayable'
 
-    database.update({ simple_key : displayable })
+    database.update({ simple_key : displayable })  # type: ignore type of .update(..) is partially unknown
 
     # get a mediator
 

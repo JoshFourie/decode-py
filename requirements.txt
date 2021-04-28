@@ -2,6 +2,7 @@ torch
 result
 gym[atari]
 torchvision
+networkx
 
 streamlit
 pytest
