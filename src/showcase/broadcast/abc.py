@@ -18,14 +18,14 @@ class SimpleGraphStrategy(Generic[VertexData], ABC):
     '''
 
     @abstractmethod
-    def extend(self, data: VertexData, *args: Any, **kwargs: Any) -> None:
+    def extend_(self, data: VertexData, *args: Any, **kwargs: Any) -> None:
         '''
         Extend the graph-like structure from the current frontier to a new node associated with this data.
         '''
         raise NotImplementedError('%s requires an .extend(..) abstract method.' % SimpleGraphStrategy.__name__)
 
     @abstractmethod
-    def retreat(self, *args: Any, **kwargs: Any) -> None:
+    def retreat_(self, *args: Any, **kwargs: Any) -> None:
         '''
         Retreat fron the current frontier to the previous node.
         '''

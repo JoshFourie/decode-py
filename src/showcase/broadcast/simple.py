@@ -38,28 +38,28 @@ class BufferedGraphColouringContext\
     '''
 
     @abstractmethod
-    def add_edge(self, source: SimpleVertexLabel, destination: SimpleVertexLabel, *args: Any, **kwargs: Any) -> None:
+    def add_edge_(self, source: SimpleVertexLabel, destination: SimpleVertexLabel, *args: Any, **kwargs: Any) -> None:
         '''
         Adds an edge from this `source` to this `destination` label on a graph-like structure.
         '''
         raise NotImplementedError('%s requires an .add_edge(..) abstract method.' % BufferedGraphColouringContext.__name__)
 
     @abstractmethod
-    def add_vertex(self, label: SimpleVertexLabel, data: VertexData, *args: Any, **kwargs: Any) -> None:
+    def add_vertex_(self, label: SimpleVertexLabel, data: VertexData, *args: Any, **kwargs: Any) -> None:
         '''
         Adds a disjointed vertex with this `label` and associated `data` to a graph-like structure.
         '''
         raise NotImplementedError('%s requires an .add_vertex(..) abstract method.' % BufferedGraphColouringContext.__name__)
     
     @abstractmethod
-    def push_to_path(self, label: SimpleVertexLabel, *arg: Any, **kwargs: Any) -> None:
+    def push_to_path_(self, label: SimpleVertexLabel, *arg: Any, **kwargs: Any) -> None:
         '''
         Pushes a vertex with this `label` to the current path on a graph-like structure.
         '''
         raise NotImplementedError('%s requires an .add_to_path(..) abstract method.' % BufferedGraphColouringContext.__name__)
 
     @abstractmethod
-    def pop_from_path(self, *args: Any, **kwargs: Any) -> SimpleVertexLabel:
+    def pop_from_path_(self, *args: Any, **kwargs: Any) -> SimpleVertexLabel:
         '''
         Pops a vertex from the current path and returns the associated `SimpleVertexLabel`. 
         '''
@@ -105,7 +105,7 @@ class SimpleBufferedGraphColouringContext\
     ABC extensions.
     '''
 
-    def add_edge(self, source: SimpleVertexLabel, destination: SimpleVertexLabel, *args: Any, **kwargs: Any) -> None:
+    def add_edge_(self, source: SimpleVertexLabel, destination: SimpleVertexLabel, *args: Any, **kwargs: Any) -> None:
         '''
         Adds an edge from this `source` to this `destination` on a `networkx` `DiGraph` instance.
         '''
@@ -113,7 +113,7 @@ class SimpleBufferedGraphColouringContext\
 
         return None
 
-    def add_vertex(self, label: SimpleVertexLabel, data: VertexData, *args: Any, **kwargs: Any) -> None:
+    def add_vertex_(self, label: SimpleVertexLabel, data: VertexData, *args: Any, **kwargs: Any) -> None:
         '''
         Adds a disjoint vertex with this `label` and `data` attribute to a `networkx` `DiGraph` instance.
 
@@ -123,7 +123,7 @@ class SimpleBufferedGraphColouringContext\
 
         return None
 
-    def push_to_path(self, label: SimpleVertexLabel, *arg: Any, **kwargs: Any) -> None:
+    def push_to_path_(self, label: SimpleVertexLabel, *arg: Any, **kwargs: Any) -> None:
         '''
         Appends this `label` to a `SimpleVertexPath` type.
         '''
@@ -131,7 +131,7 @@ class SimpleBufferedGraphColouringContext\
 
         return None
 
-    def pop_from_path(self, *args: Any, **kwargs: Any) -> SimpleVertexLabel:
+    def pop_from_path_(self, *args: Any, **kwargs: Any) -> SimpleVertexLabel:
         '''
         Pops the most recent `SimpleVertexLabel` from a `SimpleVertexPath` type.
         '''
@@ -180,7 +180,7 @@ class SimpleBufferedGraphColouringStrategy\
     ABC extensions.
     '''
 
-    def extend(self, data: VertexData, *args: Any, **kwargs: Any) -> None:
+    def extend_(self, data: VertexData, *args: Any, **kwargs: Any) -> None:
         '''
         Extends the graph-like context frontier to a new node with this data.
 
@@ -188,23 +188,23 @@ class SimpleBufferedGraphColouringStrategy\
         '''
         self.__nodes += 1
 
-        self.__context.add_vertex(label = self.__nodes, data = data)
+        self.__context.add_vertex_(label = self.__nodes, data = data)
 
-        self.__context.add_edge(source = self.__frontier, destination = self.__nodes)
+        self.__context.add_edge_(source = self.__frontier, destination = self.__nodes)
 
-        self.__context.push_to_path(label = self.__frontier)
+        self.__context.push_to_path_(label = self.__frontier)
 
         self.__frontier = self.__nodes
 
         return None
 
-    def retreat(self, *args: Any, **kwargs: Any) -> None:
+    def retreat_(self, *args: Any, **kwargs: Any) -> None:
         '''
         Retreats the current frontier of the graph-like context to the previous vertex on the current path.
 
         See https://github.com/ZaliaFlow/decode-py/issues/2 for details.
         '''
-        self.__frontier = self.__context.pop_from_path()
+        self.__frontier = self.__context.pop_from_path_()
 
         return None
 
@@ -240,18 +240,18 @@ class SimpleBroadcastFacade:
     Facade logic.
     '''
 
-    def trace(self, data: SimpleBroadcastData, *args: Any, **kwargs: Any) -> None:
+    def trace_(self, data: SimpleBroadcastData, *args: Any, **kwargs: Any) -> None:
         '''
         Starts a trace on this `data` in a given context.
         '''
-        self.__strategy.extend(data = data)
+        self.__strategy.extend_(data = data)
 
         return None
 
-    def untrace(self, *args: Any, **kwargs: Any) -> None:
+    def untrace_(self, *args: Any, **kwargs: Any) -> None:
         '''
         Stops the last trace in this context.
         '''
-        self.__strategy.retreat()
+        self.__strategy.retreat_()
 
         return None
