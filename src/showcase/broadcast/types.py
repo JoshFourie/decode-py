@@ -9,6 +9,4 @@ These are generally things that the caller needs to implement, or have access to
 from typing import TypeVar
 
 
-VertexLabel = TypeVar('VertexLabel')
-
 VertexData = TypeVar('VertexData')

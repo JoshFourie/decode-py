@@ -3,8 +3,8 @@ Simple* Collection.
 '''
 
 # built-in imports
-from abc import ABC, abstractmethod
-from typing import Any, Generic, List, Type
+from abc import abstractmethod, ABC
+from typing import Any, Generic, List
 from typing_extensions import TypeAlias
 
 # library imports
@@ -34,7 +34,7 @@ class BufferedGraphColouringContext\
     Generic[VertexData], ABC   
 ):
     '''
-    ABC for objects that can manage a context for a `BufferedGraphColouring` strategy.
+    ABC for objects that can manage a context for a `SimpleBufferedGraphColouringStrategy` type.
     '''
 
     @abstractmethod
@@ -75,7 +75,7 @@ class SimpleBufferedGraphColouringContext\
     Generic[VertexData], BufferedGraphColouringContext[VertexData]
 ):
     '''
-    Class that can manage the context for a `BufferedGraphColouring` strategy.
+    Class that can manage the context for a `SimpleBufferedGraphColouringStrategy` type.
     '''
 
     __graph: DiGraph
@@ -96,10 +96,10 @@ class SimpleBufferedGraphColouringContext\
         return None
 
     @property
-    def _graph(self) -> DiGraph: return self.__graph
+    def _path(self) -> SimpleVertexPath: return self.__path
 
     @property
-    def _path(self) -> SimpleVertexPath: return self.__path
+    def graph(self) -> DiGraph: return self.__graph
 
     '''
     ABC extensions.
@@ -174,7 +174,7 @@ class SimpleBufferedGraphColouringStrategy\
     def _frontier(self) -> SimpleVertexLabel: return self.__frontier
 
     @property
-    def _context(self) -> SimpleBufferedGraphColouringContext[VertexData]: return self.__context
+    def context(self) -> SimpleBufferedGraphColouringContext[VertexData]: return self.__context
 
     '''
     ABC extensions.
@@ -232,6 +232,9 @@ class SimpleBroadcastFacade:
 
     @property
     def _strategy(self) -> SimpleBufferedGraphColouringStrategy[SimpleBroadcastData]: return self.__strategy
+
+    @property
+    def context(self) -> SimpleBufferedGraphColouringContext[SimpleBroadcastData]: return self.__strategy.context
 
     '''
     Facade logic.
