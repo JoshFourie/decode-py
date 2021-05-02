@@ -9,16 +9,16 @@ from abc import abstractmethod, ABC
 from typing import Any, Generic
 
 # library imports
-from .types import VertexData
+from .types import GraphNodeMemento
 
 
-class SimpleGraphStrategy(Generic[VertexData], ABC):
+class SimpleGraphStrategy(Generic[GraphNodeMemento], ABC):
     '''
     ABC for objects that can extend to new nodes and move backwards on a graph-like structure.
     '''
 
     @abstractmethod
-    def extend_(self, data: VertexData, *args: Any, **kwargs: Any) -> None:
+    def extend_(self, data: GraphNodeMemento, *args: Any, **kwargs: Any) -> None:
         '''
         Extend the graph-like structure from the current frontier to a new node associated with this data.
         '''
