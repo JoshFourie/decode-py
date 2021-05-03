@@ -22,7 +22,21 @@ class StatefulVertexWriteableGraphInterface(Generic[VertexLabel, VertexData], AB
         '''
         Writes a vertex with this `label` and associates it with this `data`. 
         '''
-        raise NotImplementedError('%s requires a .write_vertex(..) abstract method.' % StatefulVertexWriteableGraphInterface.__name__)
+        raise NotImplementedError('%s requires a .write_stateful_vertex(..) abstract method.' % StatefulVertexWriteableGraphInterface.__name__)
+
+
+class StatefulVertexLoadableGraphInterface(Generic[VertexLabel, VertexData], ABC):
+    '''
+    ABC for objects that can load some `VertexData` from a graph-like structure using a `VertexLabel`.
+    '''
+
+    @abstractmethod
+    def load_stateful_vertex(self, label: VertexLabel, *args: Any, **kwargs: Any) -> VertexData:
+        '''
+        Loads the `VertexData` associated with this `label` from a graph-like structure.
+        '''
+        raise NotImplementedError('%s requires a .load_stateful_vertex(..) abstract method.' % StatefulVertexWriteableGraphInterface.__name__)
+
 
 class StatelessEdgeWriteableDirectedGraphInterface(Generic[VertexLabel], ABC):
     '''

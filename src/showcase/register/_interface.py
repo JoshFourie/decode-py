@@ -9,103 +9,14 @@ from abc import abstractmethod, ABC
 from typing import Any, Generic
 
 # library imports
-from ._types import DatabaseConnection, DatabaseLookupKey, DatabaseLookupValue, DisplayableSchema, Displayable, DisplayableSchemaKey, DisplayableTemplate, DisplayableDetails, NodeKey, NodeMemento
+from ._types import DisplayableSchema, Displayable, DisplayableSchemaKey, DisplayableTemplate, DisplayableDetails, NodeMemento
 
 
-
-class GenericDatabase(Generic[DatabaseLookupKey, DatabaseLookupValue], ABC):
-    '''
-    ABC for classes that can look up a `DatabaseLookupValue` from a `DatabaseLookupKey`.
-    '''
-
-    @abstractmethod
-    def write(self, key: DatabaseLookupKey, value: DatabaseLookupValue, *args: Any, **kwargs: Any) -> None:
-        '''
-        Writes this `DatabaseLookupValue` to this instance against this `DatabaseLookupKey`.
-        '''
-        raise NotImplementedError('%s requires .write(..) abstract method.' % GenericDatabase.__name__)
-
-    @abstractmethod
-    def load(self, key: DatabaseLookupKey, *args: Any, **kwargs: Any) -> DatabaseLookupValue:
-        '''
-        Loads a `DatabaseLookupValue` from somewhere using a `DatabaseLookupKey`.
-        '''
-        raise NotImplementedError('%s requires .load(..) abstract method.' % GenericDatabase.__name__)
-
-
-class GenericDatabaseConnector(Generic[DatabaseConnection], ABC):
-    '''
-    ABC for classes that can open or return a connection to `GenericDatabase` type from a `.database` property.
-    '''
-
-    @abstractmethod
-    def connect_database(self, connection: DatabaseConnection) -> None:
-        '''
-        Connects this instance to a `DatabaseConnection`.
-        '''
-        raise NotImplementedError('%s requires a `.connect_database(..)` abstract method.' % GenericDatabaseConnector.__name__)
-
-    @abstractmethod
-    def disconnect_database(self) -> None:
-        '''
-        Disconnects this instance from the current `DatabaseConnection`.
-        '''
-        raise NotImplementedError('%s requires a `.database` abstract method.' % GenericDatabaseConnector.__name__)
-
-
-class NodeMementoCaretakerProxyWriter(Generic[NodeKey, NodeMemento], ABC):
-    '''
-    ABC for classes that can write a `NodeMemento` to a `GenericDatabase` against a `NodeKey`.
-    '''
-
-    @abstractmethod
-    def write_memento(self, node_key: NodeKey, node_memento: NodeMemento, *args: Any, **kwargs: Any) -> None:
-        '''
-        Writes this `NodeMemento` to a connected `DisplayableDatabase` with this `NodeKey`.
-        '''
-        raise NotImplementedError('%s requires .write_memento(..) abstract method' % NodeMementoCaretakerProxyWriter.__name__)
-
-
-class NodeMementoCaretakerProxyLoader(Generic[NodeKey, NodeMemento], ABC):
-    '''
-    ABC for classes that can load a `NodeMemento` from a connected `GenericDatabase` using this `NodeKey`.
-    '''
-
-    @abstractmethod
-    def load_memento(self, node_key: NodeKey, *args: Any, **kwargs: Any) -> NodeMemento:
-        '''
-        Loads a `NodeMemento` from a connected `DisplayableDatabase` using this `NodeKey`.
-        '''
-        raise NotImplementedError('%s requires .load_memento(..) abstract method' % NodeMementoCaretakerProxyLoader.__name__)
-
-
-class DisplayablesSchemaDatabaseProxyWriter(Generic[DisplayableSchemaKey, DisplayableSchema], ABC):
-    '''
-    ABC for classes that can write a `DisplayableSchema` to a `GenericDatabase` against a `DisplayableSchemaKey`.
-    '''
-
-    @abstractmethod
-    def write_schema(self, schema_key: DisplayableSchemaKey, schema: DisplayableSchema, *args: Any, **kwargs: Any) -> None:
-        '''
-        Writes this `DisplayableSchema` to a connected `GenericDatabase` with this `DisplayableSchemaKey`.
-        '''
-        raise NotImplementedError('%s requires .write_schema(..) abstract method' % DisplayablesSchemaDatabaseProxyWriter.__name__)
-
-
-class DisplayablesSchemaDatabaseProxyLoader(Generic[DisplayableSchemaKey, DisplayableSchema], ABC):
-    '''
-    ABC for classes that can load a `DisplayableSchema` from a `GenericDatabase` using a `DisplayableSchemaKey`.
-    '''
-
-    @abstractmethod
-    def load_schema(self, schema_key: DisplayableSchemaKey, *args: Any, **kwargs: Any) -> DisplayableSchema:
-        '''
-        Loads a `DisplayableSchema` from a connected `GenericDatabase` using this `DisplayableSchemaKey`.
-        '''
-        raise NotImplementedError('%s requires .load_schema(..) abstract method' % DisplayablesSchemaDatabaseProxyLoader.__name__)
-
-
-class DisplayableTemplateFactory(Generic[DisplayableSchema, DisplayableTemplate], ABC):
+class DisplayableTemplateFactory\
+(
+    Generic[DisplayableSchema, DisplayableTemplate], 
+    ABC
+):
     '''
     ABC for classes that can make a `DisplayableTemplate` from a `DisplayableSchema`.
     '''
@@ -118,7 +29,11 @@ class DisplayableTemplateFactory(Generic[DisplayableSchema, DisplayableTemplate]
         raise NotImplementedError('%s requires .make_displayable_template(..) abstract method.' % DisplayableTemplateFactory.__name__)
 
 
-class DisplayableDetailsFactory(Generic[NodeMemento, DisplayableDetails], ABC):
+class DisplayableDetailsFactory\
+(
+    Generic[NodeMemento, DisplayableDetails], 
+    ABC
+):
     '''
     ABC for classes that can make a `DisplayableDetails` type from a `NodeMemento`.
     '''
@@ -131,7 +46,11 @@ class DisplayableDetailsFactory(Generic[NodeMemento, DisplayableDetails], ABC):
         raise NotImplementedError('%s requires .adapt_to_details(..) abstract method.' % DisplayableDetailsFactory.__name__)
 
 
-class DisplayableTemplateVisitor(Generic[DisplayableDetails, DisplayableTemplate], ABC):
+class DisplayableTemplateVisitor\
+(
+    Generic[DisplayableDetails, DisplayableTemplate], 
+    ABC
+):
     '''
     ABC for classes that can visit a `DisplayableTemplate` instance and populate it with `DisplayableDetails`.
     '''
@@ -144,7 +63,11 @@ class DisplayableTemplateVisitor(Generic[DisplayableDetails, DisplayableTemplate
         raise NotImplementedError('%s requires .visit_displayable_template(..) abstract method.' % DisplayableTemplateVisitor.__name__)
 
 
-class DisplayableTemplateAdapter(Generic[DisplayableTemplate, Displayable], ABC):
+class DisplayableTemplateAdapter\
+(
+    Generic[DisplayableTemplate, Displayable], 
+    ABC
+):
     '''
     Adapts a `DisplayableTemplate` into a `Displayable`.
     '''
@@ -157,7 +80,10 @@ class DisplayableTemplateAdapter(Generic[DisplayableTemplate, Displayable], ABC)
         raise NotImplementedError('%s requires .adapt_to_displayable(..) abstract method.' % DisplayableTemplateAdapter.__name__)
 
 
-class DisplayableBuilder(Generic[DisplayableSchemaKey, NodeMemento, Displayable]):
+class DisplayableBuilder\
+(
+    Generic[DisplayableSchemaKey, NodeMemento, Displayable]
+):
     '''
     ABC for classes that can make a `Displayable` from a `NodeKey` and a `NodeMemento`.
     '''
