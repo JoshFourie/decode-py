@@ -8,11 +8,8 @@ from typing import Any, Generic, List
 from typing_extensions import TypeAlias
 
 # library imports
-from .types import GraphNodeMemento
-from .abc import SimpleGraphStrategy
-
-# external imports
-from networkx.classes.digraph import DiGraph
+from .types import NodeKey, NodeMemento
+from .abc import NodeMementoProxyWriter, StatelessDirectedNodeMementoConnectionProxyWriter
 
 
 '''
@@ -21,49 +18,52 @@ Types.
 
 SimpleGraphKey: TypeAlias = int
 
-SimpleConnectedGraphKeyCollection: TypeAlias = List[SimpleGraphKey]
+SimpleConnectedGraphKeyCollection: TypeAlias = List[NodeKey]
 
 SimpleGraphMemento: TypeAlias = type
 
-'''
-ABC things.
-'''
-
-class BufferedGraphColouringContext\
+class SimpleGraphProxyWriter\
 (
-    Generic[GraphNodeMemento], ABC   
+    Generic[NodeKey, NodeMemento],
+    NodeMementoProxyWriter[NodeKey, NodeMemento],
+    StatelessDirectedNodeMementoConnectionProxyWriter[NodeKey]
 ):
     '''
-    ABC for objects that can manage a context for a `SimpleBufferedGraphColouringStrategy` type.
+    ABC for objects that are both `NodeMementoProxyWriter` and `StatelessDirectedNodeMementoConnectionProxyWriter`.
+    '''
+
+    # @TODO: python does not support intersection typing, does this work around for all cases?
+    
+    @abstractmethod
+    def write_memento(self, key: NodeKey, memento: NodeMemento, *args: Any, **kwargs: Any) -> None: return super().write_memento(key, memento, *args, **kwargs)
+
+    @abstractmethod
+    def write_memento_connection(self, source: NodeKey, destination: NodeKey, *args: Any, **kwargs: Any) -> None: return super().write_memento_connection(source, destination, *args, **kwargs)
+
+
+class BufferedGraphColouringStrategy\
+(
+    Generic[NodeMemento], 
+    ABC
+):
+    '''
+    ABC for objects that can extend to new nodes and move backwards on a graph-like structure.
     '''
 
     @abstractmethod
-    def add_edge_(self, source: SimpleGraphKey, destination: SimpleGraphKey, *args: Any, **kwargs: Any) -> None:
+    def extend_(self, data: NodeMemento, *args: Any, **kwargs: Any) -> None:
         '''
-        Adds an edge from this `source` to this `destination` label on a graph-like structure.
+        Extend the graph-like structure from the current frontier to a new node associated with this data.
         '''
-        raise NotImplementedError('%s requires an .add_edge(..) abstract method.' % BufferedGraphColouringContext.__name__)
+        raise NotImplementedError('%s requires an .extend(..) abstract method.' % BufferedGraphColouringStrategy.__name__)
 
     @abstractmethod
-    def add_vertex_(self, label: SimpleGraphKey, data: GraphNodeMemento, *args: Any, **kwargs: Any) -> None:
+    def retreat_(self, *args: Any, **kwargs: Any) -> None:
         '''
-        Adds a disjointed vertex with this `label` and associated `data` to a graph-like structure.
+        Retreat fron the current frontier to the previous node.
         '''
-        raise NotImplementedError('%s requires an .add_vertex(..) abstract method.' % BufferedGraphColouringContext.__name__)
-    
-    @abstractmethod
-    def push_to_path_(self, label: SimpleGraphKey, *arg: Any, **kwargs: Any) -> None:
-        '''
-        Pushes a vertex with this `label` to the current path on a graph-like structure.
-        '''
-        raise NotImplementedError('%s requires an .add_to_path(..) abstract method.' % BufferedGraphColouringContext.__name__)
+        raise NotImplementedError('%s requires a .retreat(..) abstract method.' % BufferedGraphColouringStrategy.__name__)
 
-    @abstractmethod
-    def pop_from_path_(self, *args: Any, **kwargs: Any) -> SimpleGraphKey:
-        '''
-        Pops a vertex from the current path and returns the associated `SimpleVertexLabel`. 
-        '''
-        raise NotImplementedError('%s requires a .pop_from_path(..) abstract method.' % BufferedGraphColouringContext.__name__)
 
 
 '''
@@ -72,58 +72,59 @@ Concrete classes and ABC extensions.
 
 class SimpleBufferedGraphColouringContext\
 (
-    Generic[GraphNodeMemento], BufferedGraphColouringContext[GraphNodeMemento]
+    Generic[NodeKey, NodeMemento]
 ):
     '''
     Class that can manage the context for a `SimpleBufferedGraphColouringStrategy` type.
     '''
 
-    __graph: DiGraph
-    __path: SimpleConnectedGraphKeyCollection
+    __writer: SimpleGraphProxyWriter[NodeKey, NodeMemento]
+    __path: SimpleConnectedGraphKeyCollection[NodeKey]
 
     '''
     Property and dunder methods.
     '''
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, graph: SimpleGraphProxyWriter[NodeKey, NodeMemento], *args: Any, **kwargs: Any) -> None:
         '''
         Sets up a `DiGraph` and `Path` instance. 
         '''
-        self.__graph = DiGraph()
-        
+
         self.__path = list()
+
+        self.__writer = graph
 
         return None
 
     @property
-    def _path(self) -> SimpleConnectedGraphKeyCollection: return self.__path
+    def _path(self) -> SimpleConnectedGraphKeyCollection[NodeKey]: return self.__path
 
     @property
-    def graph(self) -> DiGraph: return self.__graph
+    def writer(self) -> SimpleGraphProxyWriter[NodeKey, NodeMemento]: return self.__writer
 
     '''
     ABC extensions.
     '''
 
-    def add_edge_(self, source: SimpleGraphKey, destination: SimpleGraphKey, *args: Any, **kwargs: Any) -> None:
+    def add_edge_(self, source: NodeKey, destination: NodeKey, *args: Any, **kwargs: Any) -> None:
         '''
         Adds an edge from this `source` to this `destination` on a `networkx` `DiGraph` instance.
         '''
-        self.__graph.add_edge(u_of_edge = source, v_of_edge = destination)
+        self.__writer.write_memento_connection(source = source, destination = destination)
 
         return None
 
-    def add_vertex_(self, label: SimpleGraphKey, data: GraphNodeMemento, *args: Any, **kwargs: Any) -> None:
+    def add_vertex_(self, label: NodeKey, data: NodeMemento, *args: Any, **kwargs: Any) -> None:
         '''
         Adds a disjoint vertex with this `label` and `data` attribute to a `networkx` `DiGraph` instance.
 
         The `data` argument is stored in the vertex as a `data` attribute.
         '''
-        self.__graph.add_node(node_for_adding = label, data = data)
+        self.__writer.write_memento(key = label, memento = data)
 
         return None
 
-    def push_to_path_(self, label: SimpleGraphKey, *arg: Any, **kwargs: Any) -> None:
+    def push_to_path_(self, label: NodeKey, *arg: Any, **kwargs: Any) -> None:
         '''
         Appends this `label` to a `SimpleVertexPath` type.
         '''
@@ -131,7 +132,7 @@ class SimpleBufferedGraphColouringContext\
 
         return None
 
-    def pop_from_path_(self, *args: Any, **kwargs: Any) -> SimpleGraphKey:
+    def pop_from_path_(self, *args: Any, **kwargs: Any) -> NodeKey:
         '''
         Pops the most recent `SimpleVertexLabel` from a `SimpleVertexPath` type.
         '''
@@ -140,7 +141,8 @@ class SimpleBufferedGraphColouringContext\
 
 class SimpleBufferedGraphColouringStrategy\
 (
-    Generic[GraphNodeMemento], SimpleGraphStrategy[GraphNodeMemento]
+    Generic[NodeMemento],
+    BufferedGraphColouringStrategy[NodeMemento]
 ):
     '''
     Class that can extend to new nodes and move backwards on a graph-like structure.
@@ -149,13 +151,13 @@ class SimpleBufferedGraphColouringStrategy\
     __nodes: SimpleGraphKey
     __frontier: SimpleGraphKey
 
-    __context: SimpleBufferedGraphColouringContext[GraphNodeMemento]
+    __context: SimpleBufferedGraphColouringContext[SimpleGraphKey, NodeMemento]
 
     '''
     Dunder and property methods.
     '''
     
-    def __init__(self, context: SimpleBufferedGraphColouringContext[GraphNodeMemento], *args: Any, **kwargs: Any) -> None:
+    def __init__(self, context: SimpleBufferedGraphColouringContext[SimpleGraphKey, NodeMemento], *args: Any, **kwargs: Any) -> None:
         '''
         Sets up a `SimpleBufferedGraphColouringStrategy` in this `context`.
         '''
@@ -174,13 +176,13 @@ class SimpleBufferedGraphColouringStrategy\
     def _frontier(self) -> SimpleGraphKey: return self.__frontier
 
     @property
-    def context(self) -> SimpleBufferedGraphColouringContext[GraphNodeMemento]: return self.__context
+    def context(self) -> SimpleBufferedGraphColouringContext[SimpleGraphKey, NodeMemento]: return self.__context
 
     '''
     ABC extensions.
     '''
 
-    def extend_(self, data: GraphNodeMemento, *args: Any, **kwargs: Any) -> None:
+    def extend_(self, data: NodeMemento, *args: Any, **kwargs: Any) -> None:
         '''
         Extends the graph-like context frontier to a new node with this data.
 
@@ -209,38 +211,41 @@ class SimpleBufferedGraphColouringStrategy\
         return None
 
 
-class SimpleBroadcastFacade:
+class SimpleBroadcastFacade\
+(
+    Generic[NodeMemento]
+):
     '''
     Class that can start and stop a trace on an object, storing only type data.
     '''
 
-    __strategy: SimpleBufferedGraphColouringStrategy[SimpleGraphMemento]
+    __strategy: SimpleBufferedGraphColouringStrategy[NodeMemento]
 
     '''
     Dunder and property methods.
     '''
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, graph: SimpleGraphProxyWriter[SimpleGraphKey, NodeMemento], *args: Any, **kwargs: Any) -> None:
         '''
         Sets up a strategy and context for this instance.
         '''
-        context: SimpleBufferedGraphColouringContext[SimpleGraphMemento] = SimpleBufferedGraphColouringContext()
+        context: SimpleBufferedGraphColouringContext[SimpleGraphKey, NodeMemento] = SimpleBufferedGraphColouringContext(graph = graph)
 
         self.__strategy = SimpleBufferedGraphColouringStrategy(context = context)
 
         return None
 
     @property
-    def _strategy(self) -> SimpleBufferedGraphColouringStrategy[SimpleGraphMemento]: return self.__strategy
+    def _strategy(self) -> SimpleBufferedGraphColouringStrategy[NodeMemento]: return self.__strategy
 
     @property
-    def context(self) -> SimpleBufferedGraphColouringContext[SimpleGraphMemento]: return self.__strategy.context
+    def context(self) -> SimpleBufferedGraphColouringContext[SimpleGraphKey, NodeMemento]: return self.__strategy.context
 
     '''
     Facade logic.
     '''
 
-    def trace_(self, data: SimpleGraphMemento, *args: Any, **kwargs: Any) -> None:
+    def trace_(self, data: NodeMemento, *args: Any, **kwargs: Any) -> None:
         '''
         Starts a trace on this `data` in a given context.
         '''

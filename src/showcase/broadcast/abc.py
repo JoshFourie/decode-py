@@ -9,24 +9,31 @@ from abc import abstractmethod, ABC
 from typing import Any, Generic
 
 # library imports
-from .types import GraphNodeMemento
+from .types import NodeKey, NodeMemento
 
 
-class SimpleGraphStrategy(Generic[GraphNodeMemento], ABC):
+class NodeMementoProxyWriter(Generic[NodeKey, NodeMemento], ABC):
     '''
-    ABC for objects that can extend to new nodes and move backwards on a graph-like structure.
+    ABC for objects that can act as a proxy for writing to a database-like type.
     '''
 
     @abstractmethod
-    def extend_(self, data: GraphNodeMemento, *args: Any, **kwargs: Any) -> None:
+    def write_memento(self, key: NodeKey, memento: NodeMemento, *args: Any, **kwargs: Any) -> None:
         '''
-        Extend the graph-like structure from the current frontier to a new node associated with this data.
+        Writes this `memento` into a database-like type against this `key`.
         '''
-        raise NotImplementedError('%s requires an .extend(..) abstract method.' % SimpleGraphStrategy.__name__)
+        raise NotImplementedError('%s requires a .write_memento(..) abstract method.' % NodeMementoProxyWriter.__name__)
+
+
+class StatelessDirectedNodeMementoConnectionProxyWriter(Generic[NodeKey], ABC):
+    '''
+    ABC for objects that can act as a proxy for writing a stateless directed connection between two node keys to a database-like type.
+    '''
 
     @abstractmethod
-    def retreat_(self, *args: Any, **kwargs: Any) -> None:
+    def write_memento_connection(self, source: NodeKey, destination: NodeKey, *args: Any, **kwargs: Any) -> None:
         '''
-        Retreat fron the current frontier to the previous node.
+        Writes a connection from this `source` key to this `destination` one in a database-like type.
         '''
-        raise NotImplementedError('%s requires a .retreat(..) abstract method.' % SimpleGraphStrategy.__name__)
+        raise NotImplementedError('%s requires a .write_memento_connection(..) abstract method.' % StatelessDirectedNodeMementoConnectionProxyWriter.__name__)
+
