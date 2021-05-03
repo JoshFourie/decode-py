@@ -4,13 +4,12 @@ ABC types for the broadcast module.
 See https://github.com/ZaliaFlow/decode-py/issues/5.
 '''
 
-
 # built-in imports
 from abc import abstractmethod, ABC
 from typing import Any, Generic
 
 # library imports
-from .types import VertexLabel, VertexData
+from ._types import VertexLabel, VertexData
 
 
 class StatefulVertexWriteableGraphInterface(Generic[VertexLabel, VertexData], ABC):
@@ -36,3 +35,20 @@ class StatelessEdgeWriteableDirectedGraphInterface(Generic[VertexLabel], ABC):
         Writes an unlabelled directed edge from a vertex with this `source` label to a vertex with this `destination` label.
         '''
         raise NotImplementedError('%s requires a .write_directed_edge(..) abstract method.' % StatelessEdgeWriteableDirectedGraphInterface.__name__)
+
+
+class PartiallyStatefulDirectedGraphInterface\
+(
+    Generic[VertexLabel, VertexData],
+    StatefulVertexWriteableGraphInterface[VertexLabel, VertexData],
+    StatelessEdgeWriteableDirectedGraphInterface[VertexLabel]
+):
+    '''
+    Interface for objects that are both `StatefulVertexWriteableGraphInterface` and `StatelessEdgeWriteableDirectedGraphInterface`.
+    '''
+
+    # @TODO: python does not support intersection typing, does this work around for all cases?
+
+    # See: https://github.com/python/typing/issues/213
+
+    pass

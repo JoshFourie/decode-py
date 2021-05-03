@@ -9,8 +9,8 @@ from collections import UserDict
 from typing_extensions import TypeAlias
 
 # library imports
-from .types import DatabaseLookupValue, Displayable
-from .abc import GenericDatabase
+from ._types import DatabaseLookupValue, Displayable
+from ._interface import GenericDatabase
 
 
 '''

@@ -6,7 +6,7 @@ Tests the Simple* implementation of a broadcast module.
 from typing import Any, Generic, TypeVar
 
 # library imports
-from ..simple import SimpleBroadcastFacade, SimpleBufferedGraphColouringContext, SimpleBufferedGraphColouringStrategy, SimpleGraphProxyWriter, SimpleGraphKey, SimpleGraphMemento
+from ..simple import SimpleBroadcastFacade, SimpleBufferedGraphColouringContext, SimpleBufferedGraphColouringStrategy, SimpleGraphProxyWriterInterface, SimpleGraphKey, SimpleGraphMemento
 
 # external imports
 from networkx.classes.digraph import DiGraph
@@ -30,7 +30,7 @@ class MockDisplayable:
 class MockSimpleGraphDB\
 (
     Generic[MockVertexData],
-    SimpleGraphProxyWriter[SimpleGraphKey, MockVertexData]
+    SimpleGraphProxyWriterInterface[SimpleGraphKey, MockVertexData]
 ):
     '''
     Type for mocking a simple database.
@@ -39,10 +39,10 @@ class MockSimpleGraphDB\
     data: DiGraph
 
     def __init__(self) -> None: self.data = DiGraph()
+
+    def write_stateful_vertex(self, label: SimpleGraphKey, data: MockVertexData, *args: Any, **kwargs: Any) -> None: self.data.add_node(node_for_adding = label, memento = data)  # type: ignore unkonwn
     
-    def write_memento(self, key: SimpleGraphKey, memento: MockVertexData, *args: Any, **kwargs: Any) -> None: self.data.add_node(node_for_adding = key, memento = memento)  # type: ignore unkonwn
-    
-    def write_memento_connection(self, source: SimpleGraphKey, destination: SimpleGraphKey, *args: Any, **kwargs: Any) -> None: self.data.add_edge(u_of_edge = source, v_of_edge = destination)  # type: ignore unkonwn member
+    def write_stateless_directed_edge(self, source: SimpleGraphKey, destination: SimpleGraphKey, *args: Any, **kwargs: Any) -> None: self.data.add_edge(u_of_edge = source, v_of_edge = destination)  # type: ignore unkonwn member
 
 
 '''

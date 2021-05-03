@@ -7,12 +7,11 @@ from typing import Any, Generic, Hashable
 from typing_extensions import TypeAlias
 
 # library imports
-from .abc import StatefulVertexWriteableGraphInterface, StatelessEdgeWriteableDirectedGraphInterface
-from .types import VertexData
+from ._interface import PartiallyStatefulDirectedGraphInterface
+from ._types import VertexData
 
 # external imports
 from networkx.classes.digraph import DiGraph
-
 
 '''
 Types.
@@ -28,8 +27,7 @@ Concrete classes and ABC extensions.
 class SimpleGraphDB\
 (
     Generic[VertexData], 
-    StatefulVertexWriteableGraphInterface[SimpleVertexLabel, VertexData],
-    StatelessEdgeWriteableDirectedGraphInterface[SimpleVertexLabel]
+    PartiallyStatefulDirectedGraphInterface[SimpleVertexLabel, VertexData]
 ):
     '''
     Class that can write stateful vertices and stateless directed edges into a graph-like structure.

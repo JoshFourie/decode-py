@@ -8,8 +8,9 @@ from typing import Any, Generic, List
 from typing_extensions import TypeAlias
 
 # library imports
-from .types import NodeKey, NodeMemento
-from .abc import NodeMementoProxyWriter, StatelessDirectedNodeMementoConnectionProxyWriter
+from ._types import NodeKey, NodeMemento
+
+from ..database import PartiallyStatefulDirectedGraphInterface
 
 
 '''
@@ -22,24 +23,12 @@ SimpleConnectedGraphKeyCollection: TypeAlias = List[NodeKey]
 
 SimpleGraphMemento: TypeAlias = type
 
-class SimpleGraphProxyWriter\
-(
-    Generic[NodeKey, NodeMemento],
-    NodeMementoProxyWriter[NodeKey, NodeMemento],
-    StatelessDirectedNodeMementoConnectionProxyWriter[NodeKey]
-):
-    '''
-    ABC for objects that are both `NodeMementoProxyWriter` and `StatelessDirectedNodeMementoConnectionProxyWriter`.
-    '''
+SimpleGraphProxyWriterInterface: TypeAlias = PartiallyStatefulDirectedGraphInterface
 
-    # @TODO: python does not support intersection typing, does this work around for all cases?
-    
-    @abstractmethod
-    def write_memento(self, key: NodeKey, memento: NodeMemento, *args: Any, **kwargs: Any) -> None: return super().write_memento(key, memento, *args, **kwargs)
 
-    @abstractmethod
-    def write_memento_connection(self, source: NodeKey, destination: NodeKey, *args: Any, **kwargs: Any) -> None: return super().write_memento_connection(source, destination, *args, **kwargs)
-
+'''
+ABC definitions for this module.
+'''
 
 class BufferedGraphColouringStrategy\
 (
@@ -78,14 +67,14 @@ class SimpleBufferedGraphColouringContext\
     Class that can manage the context for a `SimpleBufferedGraphColouringStrategy` type.
     '''
 
-    __writer: SimpleGraphProxyWriter[NodeKey, NodeMemento]
+    __writer: SimpleGraphProxyWriterInterface[NodeKey, NodeMemento]
     __path: SimpleConnectedGraphKeyCollection[NodeKey]
 
     '''
     Property and dunder methods.
     '''
 
-    def __init__(self, graph: SimpleGraphProxyWriter[NodeKey, NodeMemento], *args: Any, **kwargs: Any) -> None:
+    def __init__(self, graph: SimpleGraphProxyWriterInterface[NodeKey, NodeMemento], *args: Any, **kwargs: Any) -> None:
         '''
         Sets up a `DiGraph` and `Path` instance. 
         '''
@@ -100,7 +89,7 @@ class SimpleBufferedGraphColouringContext\
     def _path(self) -> SimpleConnectedGraphKeyCollection[NodeKey]: return self.__path
 
     @property
-    def writer(self) -> SimpleGraphProxyWriter[NodeKey, NodeMemento]: return self.__writer
+    def writer(self) -> SimpleGraphProxyWriterInterface[NodeKey, NodeMemento]: return self.__writer
 
     '''
     ABC extensions.
@@ -110,7 +99,7 @@ class SimpleBufferedGraphColouringContext\
         '''
         Adds an edge from this `source` to this `destination` on a `networkx` `DiGraph` instance.
         '''
-        self.__writer.write_memento_connection(source = source, destination = destination)
+        self.__writer.write_stateless_directed_edge(source = source, destination = destination)
 
         return None
 
@@ -120,7 +109,7 @@ class SimpleBufferedGraphColouringContext\
 
         The `data` argument is stored in the vertex as a `data` attribute.
         '''
-        self.__writer.write_memento(key = label, memento = data)
+        self.__writer.write_stateful_vertex(label = label, data = data)
 
         return None
 
@@ -225,7 +214,7 @@ class SimpleBroadcastFacade\
     Dunder and property methods.
     '''
 
-    def __init__(self, graph: SimpleGraphProxyWriter[SimpleGraphKey, NodeMemento], *args: Any, **kwargs: Any) -> None:
+    def __init__(self, graph: SimpleGraphProxyWriterInterface[SimpleGraphKey, NodeMemento], *args: Any, **kwargs: Any) -> None:
         '''
         Sets up a strategy and context for this instance.
         '''

@@ -9,7 +9,7 @@ from abc import abstractmethod, ABC
 from typing import Any, Generic
 
 # library imports
-from .types import DatabaseConnection, DatabaseLookupKey, DatabaseLookupValue, DisplayableSchema, Displayable, DisplayableSchemaKey, DisplayableTemplate, DisplayableDetails, NodeKey, NodeMemento
+from ._types import DatabaseConnection, DatabaseLookupKey, DatabaseLookupValue, DisplayableSchema, Displayable, DisplayableSchemaKey, DisplayableTemplate, DisplayableDetails, NodeKey, NodeMemento
 
 
 
