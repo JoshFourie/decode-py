@@ -25,12 +25,3 @@ DisplayableDetails = TypeVar('DisplayableDetails')
 NodeKey = TypeVar('NodeKey')
 
 NodeMemento = TypeVar('NodeMemento')
-
-
-# database-like types
-
-DatabaseLookupKey = TypeVar('DatabaseLookupKey')
-
-DatabaseLookupValue = TypeVar('DatabaseLookupValue')
-
-DatabaseConnection = TypeVar('DatabaseConnection')

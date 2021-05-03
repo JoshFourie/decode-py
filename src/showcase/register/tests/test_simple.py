@@ -3,10 +3,12 @@ Tests the Simple implementations of the register ABCs.
 '''
 
 # built-in imports
+from typing import Any
 from typing_extensions import TypeAlias
+from collections import UserDict
 
 # library imports
-from ..simple import *
+from ..simple import SimpleDisplayableMediator, StatefulVertexGraphLoaderInterface
 
 
 '''
@@ -18,42 +20,20 @@ MockSimpleKey: TypeAlias = str
 MockDisplayable: TypeAlias = str
 
 
-'''
-Unit tests for database-related activities.
-'''
-
-def test_simple_generic_database_integration() -> None:
+class MockDisplayableDatabase\
+(
+    StatefulVertexGraphLoaderInterface[MockSimpleKey, MockDisplayable],
+    UserDict # type: ignore expected type arguments
+):
     '''
-    Tests that a SimpleGenericDatabase can write and load a mock `NodeKey` and `NodeMemento`.
+    Mock-up for a displayable database.
     '''
-    # set up
-    database: SimpleGenericDatabase[MockDisplayable] = SimpleGenericDatabase()
 
-    mock_key: MockSimpleKey = 'MockSimpleKey'; mock_memento: MockDisplayable = 'MockDisplayable'
-
-    # write to database
-    database.write(mock_key, mock_memento)
-
-    assert database.data == {mock_key : mock_memento}, 'expected <%s>.write(..) to update a `UserDict`.' % SimpleGenericDatabase.__name__
-
-    # try load with a good key
-
-    value: str = database.load(mock_key)
-
-    assert value == mock_memento, 'expected <%s>.load(..) to return a value on a valid key selection.' % SimpleGenericDatabase.__name__
-
-    # try load with a bad key
-
-    try: 
-        database.load('BadNodeKey')
-        
-        raise AssertionError('expected <%s>.load(..) to throw a KeyError type on a bad key selection.' % SimpleGenericDatabase.__name__)
-
-    except KeyError: pass # test passed
-
-    # all tests passed
-
-    return None   
+    def load_stateful_vertex(self, label: MockSimpleKey, *args: Any, **kwargs: Any) -> MockDisplayable:
+        '''
+        Loads a stateful vertex from the dictionary.
+        '''
+        return self[label] # type: ignore partially unknown
 
 
 '''
@@ -67,11 +47,11 @@ def test_simple_displayable_mediator() -> None:
 
     # set up
 
-    database: SimpleGenericDatabase[MockDisplayable] = SimpleGenericDatabase()
+    database: MockDisplayableDatabase = MockDisplayableDatabase()
 
     simple_key: MockSimpleKey = 'SimpleKey'; displayable: MockDisplayable = 'Displayable'
 
-    database.update({ simple_key : displayable })
+    database.update({ simple_key : displayable })  # type: ignore type of .update(..) is partially unknown
 
     # get a mediator
 
@@ -88,7 +68,7 @@ def test_simple_displayable_mediator() -> None:
     try: 
         test: MockDisplayable = mediator.get_displayable(key = 'BadKey')
 
-        raise AssertionError('expected that <%s>.get_displayable(..) would throw a key error on a bad key.' % SimpleDisplayableMediator.__name__)
+        raise AssertionError('expected that <%s>.get_displayable(..) would throw a key error on a bad key.' % SimpleDisplayableMediator.__name__) # pragma: no cover 
 
     except KeyError: pass # check passed
 
