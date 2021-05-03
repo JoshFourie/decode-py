@@ -28,11 +28,11 @@ def test_stateful_vertex_writing_for_simple_graph_database() -> None:
 
     # test adding a vertex
     
-    graph_db.write_stateful_vertex(label = 0, data = None)
+    graph_db.write_stateful_vertex_(label = 0, data = None)
 
     assert list(graph_db._graph.nodes) == [0], 'expected <%s>.write_stateful_vertex(..) to add a vertex to the list of nodes.' % SimpleGraphDB.__name__ # type: ignore private usage and unknown field type
 
-    graph_db.write_stateful_vertex(label = 9, data = None)
+    graph_db.write_stateful_vertex_(label = 9, data = None)
 
     assert list(graph_db._graph.nodes) == [0, 9], 'expected <%s>.write_stateful_vertex(..) to add a vertex to the list of nodes.' % SimpleGraphDB.__name__ # type: ignore private usage and unknown field type
 
@@ -50,9 +50,19 @@ def test_stateless_edge_writing_for_simple_graph_database() -> None:
 
     # test adding an edge between existing vertices
 
-    graph_db.write_stateless_directed_edge(source = 0, destination = 9)
+    graph_db.write_stateful_vertex_(label = 0, data = None)
 
-    assert list(graph_db._graph.edges) == [(0, 9)], 'expected <%s>.write_stateless_directed_edge(..) to add an edge from nodes 0 -> 9 in the list of edges.' % SimpleGraphDB.__name__ # type: ignore unknown field type
+    graph_db.write_stateful_vertex_(label = 1, data = None)
+
+    graph_db.write_stateless_directed_edge_(source = 0, destination = 1)
+
+    assert list(graph_db._graph.edges) == [(0, 1)], 'expected <%s>.write_stateless_directed_edge(..) to add an edge.' % SimpleGraphDB.__name__ # type: ignore unknown field type
+
+    # test adding an edge between non existing vertices
+
+    graph_db.write_stateless_directed_edge_(source = 2, destination = 3)
+
+    assert list(graph_db._graph.edges) == [(0, 1), (2, 3)], 'expected <%s>.write_stateless_directed_edge(..) to add an edge .' % SimpleGraphDB.__name__ # type: ignore unknown field type
 
     # all tests passed
 
@@ -77,7 +87,7 @@ def test_stateful_vertex_loading_for_simple_graph_database() -> None:
 
     # write some data for the graph
 
-    graph_db.write_stateful_vertex(label = label, data = expected)
+    graph_db.write_stateful_vertex_(label = label, data = expected)
 
     # test loading some data from an existing vertex
 

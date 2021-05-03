@@ -8,7 +8,7 @@ from typing_extensions import TypeAlias
 from collections import UserDict
 
 # library imports
-from ..simple import SimpleDisplayableMediator, StatefulVertexLoadableGraphInterface
+from ..simple import SimpleDisplayableMediator, StatefulVertexGraphLoaderInterface
 
 
 '''
@@ -22,7 +22,7 @@ MockDisplayable: TypeAlias = str
 
 class MockDisplayableDatabase\
 (
-    StatefulVertexLoadableGraphInterface[MockSimpleKey, MockDisplayable],
+    StatefulVertexGraphLoaderInterface[MockSimpleKey, MockDisplayable],
     UserDict # type: ignore expected type arguments
 ):
     '''

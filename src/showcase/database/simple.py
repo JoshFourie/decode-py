@@ -7,7 +7,7 @@ from typing import Any, Generic, Hashable
 from typing_extensions import TypeAlias
 
 # library imports
-from ._interface import PartiallyStatefulDirectedGraphInterface, StatefulVertexLoadableGraphInterface
+from ._interface import PartiallyStatefulDirectedGraphInterface, StatefulVertexGraphLoaderInterface
 from ._types import VertexData
 
 # external imports
@@ -28,7 +28,7 @@ class SimpleGraphDB\
 (
     Generic[VertexData], 
     PartiallyStatefulDirectedGraphInterface[SimpleVertexLabel, VertexData],
-    StatefulVertexLoadableGraphInterface[SimpleVertexLabel, VertexData]
+    StatefulVertexGraphLoaderInterface[SimpleVertexLabel, VertexData]
 ):
     '''
     Class that can write stateful vertices and stateless directed edges into a graph-like structure.
@@ -55,15 +55,15 @@ class SimpleGraphDB\
     ABC extensions.
     '''
 
-    def write_stateful_vertex(self, label: SimpleVertexLabel, data: VertexData, *args: Any, **kwargs: Any) -> None:
+    def write_stateful_vertex_(self, label: SimpleVertexLabel, data: VertexData, *args: Any, **kwargs: Any) -> None:
         '''
-        Writes a vertex with this `label` associated with this data into a `networkx.DiGraph` object.
+        Writes a vertex with this `label` associated with this `data` into a `networkx.DiGraph` object.
         '''
         self.__graph.add_node(node_for_adding = label, data = data)
 
         return None
 
-    def write_stateless_directed_edge(self, source: SimpleVertexLabel, destination: SimpleVertexLabel, *args: Any, **kwargs: Any) -> None:
+    def write_stateless_directed_edge_(self, source: SimpleVertexLabel, destination: SimpleVertexLabel, *args: Any, **kwargs: Any) -> None:
         '''
         Writes an unlabelled edge between a vertex with this `source` label and one with this `destination` label into a `networkx.DiGraph` object.
         '''

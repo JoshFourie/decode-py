@@ -10,7 +10,7 @@ from typing_extensions import TypeAlias
 # library imports
 from ._types import Displayable
 
-from ..database import StatefulVertexLoadableGraphInterface
+from ..database import StatefulVertexGraphLoaderInterface
 
 
 '''
@@ -31,9 +31,9 @@ class SimpleDisplayableMediator\
     Class that can get a `Displayable` using a `SimpleKey`.
     '''
 
-    __database: StatefulVertexLoadableGraphInterface[SimpleKey, Displayable]
+    __database: StatefulVertexGraphLoaderInterface[SimpleKey, Displayable]
 
-    def __init__(self, database: StatefulVertexLoadableGraphInterface[SimpleKey, Displayable], *args: Any, **kwargs: Any) -> None:
+    def __init__(self, database: StatefulVertexGraphLoaderInterface[SimpleKey, Displayable], *args: Any, **kwargs: Any) -> None:
         '''
         Calls the super classes and sets up a `SimpleDisplayableBuilder`
         '''

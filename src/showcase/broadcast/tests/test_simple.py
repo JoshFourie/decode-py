@@ -6,7 +6,7 @@ Tests the Simple* implementation of a broadcast module.
 from typing import Any, Generic, TypeVar
 
 # library imports
-from ..simple import SimpleBroadcastFacade, SimpleBufferedGraphColouringContext, SimpleBufferedGraphColouringStrategy, SimpleGraphProxyWriterInterface, SimpleGraphKey, SimpleGraphMemento
+from ..simple import SimpleBroadcastFacade, SimpleBufferedGraphColouringContext, SimpleBufferedGraphColouringStrategy, PartiallyStatefulDirectedGraphInterface, SimpleGraphKey, SimpleGraphMemento
 
 # external imports
 from networkx.classes.digraph import DiGraph
@@ -30,7 +30,7 @@ class MockDisplayable:
 class MockSimpleGraphDB\
 (
     Generic[MockVertexData],
-    SimpleGraphProxyWriterInterface[SimpleGraphKey, MockVertexData]
+    PartiallyStatefulDirectedGraphInterface[SimpleGraphKey, MockVertexData]
 ):
     '''
     Type for mocking a simple database.
@@ -40,9 +40,9 @@ class MockSimpleGraphDB\
 
     def __init__(self) -> None: self.data = DiGraph()
 
-    def write_stateful_vertex(self, label: SimpleGraphKey, data: MockVertexData, *args: Any, **kwargs: Any) -> None: self.data.add_node(node_for_adding = label, memento = data)  # type: ignore unkonwn
+    def write_stateful_vertex_(self, label: SimpleGraphKey, data: MockVertexData, *args: Any, **kwargs: Any) -> None: self.data.add_node(node_for_adding = label, memento = data)  # type: ignore unkonwn
     
-    def write_stateless_directed_edge(self, source: SimpleGraphKey, destination: SimpleGraphKey, *args: Any, **kwargs: Any) -> None: self.data.add_edge(u_of_edge = source, v_of_edge = destination)  # type: ignore unkonwn member
+    def write_stateless_directed_edge_(self, source: SimpleGraphKey, destination: SimpleGraphKey, *args: Any, **kwargs: Any) -> None: self.data.add_edge(u_of_edge = source, v_of_edge = destination)  # type: ignore unkonwn member
 
 
 '''
@@ -56,21 +56,21 @@ def test_simple_buffered_graph_colouring_context() -> None:
 
     graph: MockSimpleGraphDB[None] = MockSimpleGraphDB()
 
-    context: SimpleBufferedGraphColouringContext[SimpleGraphKey, None] = SimpleBufferedGraphColouringContext(graph = graph)
+    context: SimpleBufferedGraphColouringContext[SimpleGraphKey, None] = SimpleBufferedGraphColouringContext(writer = graph)
 
     # test adding a vertex
 
-    context.add_vertex_(label = 0, data = None)
+    context.add_vertex_with_data_(label = 0, data = None)
 
     assert list(context.writer.data.nodes) == [0], 'expected <%s>.add_vertex(..) to add a vertex to the list of nodes.' % SimpleBufferedGraphColouringContext.__name__ # type: ignore unknown field type
 
-    context.add_vertex_(label = 9, data = None)
+    context.add_vertex_with_data_(label = 9, data = None)
 
     assert list(context.writer.data.nodes) == [0, 9], 'expected <%s>.add_vertex(..) to add a vertex to the list of nodes.' % SimpleBufferedGraphColouringContext.__name__ # type: ignore unknown field type
 
     # test adding an edge between existing vertices
 
-    context.add_edge_(source = 0, destination = 9)
+    context.add_edge_between_(source = 0, destination = 9)
 
     assert list(context.writer.data.edges) == [(0, 9)], 'expected <%s>.add_edge(..) to add an edge from nodes 0 -> 9 in the list of edges.' % SimpleBufferedGraphColouringContext.__name__ # type: ignore unknown field type
 
@@ -98,7 +98,7 @@ def test_buffered_graph_colouring_strategy() -> None:
 
     graph: MockSimpleGraphDB[None] = MockSimpleGraphDB()
 
-    context: SimpleBufferedGraphColouringContext[SimpleGraphKey, None] = SimpleBufferedGraphColouringContext(graph = graph)
+    context: SimpleBufferedGraphColouringContext[SimpleGraphKey, None] = SimpleBufferedGraphColouringContext(writer = graph)
 
     strategy: SimpleBufferedGraphColouringStrategy[None] = SimpleBufferedGraphColouringStrategy(context = context)
 
@@ -160,7 +160,7 @@ def test_nested_buffered_graph_colouring_strategy() -> None:
     '''
     graph: MockSimpleGraphDB[None] = MockSimpleGraphDB()
 
-    context: SimpleBufferedGraphColouringContext[SimpleGraphKey, None] = SimpleBufferedGraphColouringContext(graph = graph)
+    context: SimpleBufferedGraphColouringContext[SimpleGraphKey, None] = SimpleBufferedGraphColouringContext(writer = graph)
 
     strategy: SimpleBufferedGraphColouringStrategy[None] = SimpleBufferedGraphColouringStrategy(context = context)
 

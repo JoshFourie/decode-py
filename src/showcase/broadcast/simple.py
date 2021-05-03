@@ -23,8 +23,6 @@ SimpleConnectedGraphKeyCollection: TypeAlias = List[NodeKey]
 
 SimpleGraphMemento: TypeAlias = type
 
-SimpleGraphProxyWriterInterface: TypeAlias = PartiallyStatefulDirectedGraphInterface
-
 
 '''
 ABC definitions for this module.
@@ -67,21 +65,21 @@ class SimpleBufferedGraphColouringContext\
     Class that can manage the context for a `SimpleBufferedGraphColouringStrategy` type.
     '''
 
-    __writer: SimpleGraphProxyWriterInterface[NodeKey, NodeMemento]
+    __writer: PartiallyStatefulDirectedGraphInterface[NodeKey, NodeMemento]
     __path: SimpleConnectedGraphKeyCollection[NodeKey]
 
     '''
     Property and dunder methods.
     '''
 
-    def __init__(self, graph: SimpleGraphProxyWriterInterface[NodeKey, NodeMemento], *args: Any, **kwargs: Any) -> None:
+    def __init__(self, writer: PartiallyStatefulDirectedGraphInterface[NodeKey, NodeMemento], *args: Any, **kwargs: Any) -> None:
         '''
-        Sets up a `DiGraph` and `Path` instance. 
+        Sets up a path and graph for this context. 
         '''
 
         self.__path = list()
 
-        self.__writer = graph
+        self.__writer = writer
 
         return None
 
@@ -89,27 +87,27 @@ class SimpleBufferedGraphColouringContext\
     def _path(self) -> SimpleConnectedGraphKeyCollection[NodeKey]: return self.__path
 
     @property
-    def writer(self) -> SimpleGraphProxyWriterInterface[NodeKey, NodeMemento]: return self.__writer
+    def writer(self) -> PartiallyStatefulDirectedGraphInterface[NodeKey, NodeMemento]: return self.__writer
 
     '''
     ABC extensions.
     '''
 
-    def add_edge_(self, source: NodeKey, destination: NodeKey, *args: Any, **kwargs: Any) -> None:
+    def add_edge_between_(self, source: NodeKey, destination: NodeKey, *args: Any, **kwargs: Any) -> None:
         '''
         Adds an edge from this `source` to this `destination` on a `networkx` `DiGraph` instance.
         '''
-        self.__writer.write_stateless_directed_edge(source = source, destination = destination)
+        self.__writer.write_stateless_directed_edge_(source = source, destination = destination)
 
         return None
 
-    def add_vertex_(self, label: NodeKey, data: NodeMemento, *args: Any, **kwargs: Any) -> None:
+    def add_vertex_with_data_(self, label: NodeKey, data: NodeMemento, *args: Any, **kwargs: Any) -> None:
         '''
         Adds a disjoint vertex with this `label` and `data` attribute to a `networkx` `DiGraph` instance.
 
         The `data` argument is stored in the vertex as a `data` attribute.
         '''
-        self.__writer.write_stateful_vertex(label = label, data = data)
+        self.__writer.write_stateful_vertex_(label = label, data = data)
 
         return None
 
@@ -179,9 +177,9 @@ class SimpleBufferedGraphColouringStrategy\
         '''
         self.__nodes += 1
 
-        self.__context.add_vertex_(label = self.__nodes, data = data)
+        self.__context.add_vertex_with_data_(label = self.__nodes, data = data)
 
-        self.__context.add_edge_(source = self.__frontier, destination = self.__nodes)
+        self.__context.add_edge_between_(source = self.__frontier, destination = self.__nodes)
 
         self.__context.push_to_path_(label = self.__frontier)
 
@@ -214,11 +212,11 @@ class SimpleBroadcastFacade\
     Dunder and property methods.
     '''
 
-    def __init__(self, graph: SimpleGraphProxyWriterInterface[SimpleGraphKey, NodeMemento], *args: Any, **kwargs: Any) -> None:
+    def __init__(self, graph: PartiallyStatefulDirectedGraphInterface[SimpleGraphKey, NodeMemento], *args: Any, **kwargs: Any) -> None:
         '''
         Sets up a strategy and context for this instance.
         '''
-        context: SimpleBufferedGraphColouringContext[SimpleGraphKey, NodeMemento] = SimpleBufferedGraphColouringContext(graph = graph)
+        context: SimpleBufferedGraphColouringContext[SimpleGraphKey, NodeMemento] = SimpleBufferedGraphColouringContext(writer = graph)
 
         self.__strategy = SimpleBufferedGraphColouringStrategy(context = context)
 
