@@ -1,12 +1,12 @@
 '''
-Tests the Simple* implementation of a broadcast module.
+Tests the Simple* implementation of a maker module.
 '''
 
 # built-in imports
 from typing import Any, Generic, TypeVar
 
 # library imports
-from ..simple import SimpleBroadcastFacade, SimpleBufferedGraphColouringContext, SimpleBufferedGraphColouringStrategy, PartiallyStatefulDirectedGraphInterface, SimpleGraphKey, SimpleGraphMemento
+from ..simple import SimpleMakerFacade, SimpleBufferedGraphColouringContext, SimpleBufferedGraphColouringStrategy, PartiallyStatefulDirectedGraphInterface, SimpleGraphKey, SimpleGraphMemento
 
 # external imports
 from networkx.classes.digraph import DiGraph
@@ -18,13 +18,13 @@ Mock-ups for testing.
 MockVertexData = TypeVar('MockVertexData')
 
 
-class MockDisplayable:
+class MockDisplayableComponent:
     '''
-    Type for testing the broadcast facade.
+    Type for testing the maker facade.
     '''
 
     @classmethod
-    def display(cls) -> str: return 'MockDisplayable'
+    def display(cls) -> str: return 'MockDisplayableComponent'
 
 
 class MockSimpleGraphDB\
@@ -178,38 +178,38 @@ def test_nested_buffered_graph_colouring_strategy() -> None:
 
 
 '''
-Unit tests for the simple broadcast facade.
+Unit tests for the simple maker facade.
 '''
 
-def test_simple_broadcast_facade() -> None:
+def test_simple_maker_facade() -> None:
     '''
-    Tests the behaviour of the `SimpleBroadcastFacade` object.
+    Tests the behaviour of the `SimpleMakerFacade` object.
     '''
     graph: MockSimpleGraphDB[SimpleGraphMemento] = MockSimpleGraphDB()
 
-    facade: SimpleBroadcastFacade[SimpleGraphMemento] = SimpleBroadcastFacade(graph = graph)
+    facade: SimpleMakerFacade[SimpleGraphMemento] = SimpleMakerFacade(graph = graph)
 
     # test that the facade can start a trace
 
-    facade.trace_(data = MockDisplayable)
+    facade.trace_(data = MockDisplayableComponent)
 
-    assert list(facade.context.writer.data.edges) == [(0, 1)], 'expected that <%s>.trace(..) would add an edge to the context.' % SimpleBroadcastFacade.__name__  # type: ignore unknown members  
+    assert list(facade.context.writer.data.edges) == [(0, 1)], 'expected that <%s>.trace(..) would add an edge to the context.' % SimpleMakerFacade.__name__  # type: ignore unknown members  
 
-    assert facade.context._path == [0], 'expected that <%s>.trace(..) would add an entrypoint to the current path.' % SimpleBroadcastFacade.__name__  # type: ignore private usage
+    assert facade.context._path == [0], 'expected that <%s>.trace(..) would add an entrypoint to the current path.' % SimpleMakerFacade.__name__  # type: ignore private usage
 
-    assert facade._strategy._nodes == 1 and facade._strategy._frontier == 1, 'expected that <%s>.trace(..) would update the strategy.' % SimpleBroadcastFacade.__name__  # type: ignore private usage
+    assert facade._strategy._nodes == 1 and facade._strategy._frontier == 1, 'expected that <%s>.trace(..) would update the strategy.' % SimpleMakerFacade.__name__  # type: ignore private usage
 
     # test that a facade can stop a trace
 
     facade.untrace_()
 
-    assert facade.context._path == [ ], 'expected that <%s>.untrace(..) would pop everything from the current path.' % SimpleBroadcastFacade.__name__  # type: ignore private usage
+    assert facade.context._path == [ ], 'expected that <%s>.untrace(..) would pop everything from the current path.' % SimpleMakerFacade.__name__  # type: ignore private usage
 
-    assert facade._strategy._nodes == 1 and facade._strategy._frontier == 0, 'expected that <%s>.untrace(..) would update the strategy to the last frontier.' % SimpleBroadcastFacade.__name__  # type: ignore private usage 
+    assert facade._strategy._nodes == 1 and facade._strategy._frontier == 0, 'expected that <%s>.untrace(..) would update the strategy to the last frontier.' % SimpleMakerFacade.__name__  # type: ignore private usage 
 
     # test that a facade can store type data
 
-    assert facade.context.writer.data.nodes[1].get('memento').display() == 'MockDisplayable', 'expected that <%s> would update the context with a callable MockDisplayable type' % SimpleBroadcastFacade.__name__ # type: ignore unknown members
+    assert facade.context.writer.data.nodes[1].get('memento').display() == 'MockDisplayableComponent', 'expected that <%s> would update the context with a callable MockDisplayableComponent type' % SimpleMakerFacade.__name__ # type: ignore unknown members
 
     # all tests passed
 

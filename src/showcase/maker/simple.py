@@ -198,7 +198,7 @@ class SimpleBufferedGraphColouringStrategy\
         return None
 
 
-class SimpleBroadcastFacade\
+class SimpleMakerFacade\
 (
     Generic[NodeMemento]
 ):

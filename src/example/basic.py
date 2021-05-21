@@ -1,22 +1,22 @@
 '''
-Basic example of a displayable neural net with inferred composability.
+Basic example of a component neural net with inferred composability.
 '''
 
 import sys; sys.path.append('../')  # silly hack to get the zalia package
 
 # library imports
-from src.showcase.broadcast.simple import SimpleBroadcastFacade, SimpleGraphKey, SimpleGraphMemento
+from src.showcase.maker.simple import SimpleMakerFacade, SimpleGraphKey, SimpleGraphMemento
 from src.showcase.database.simple import SimpleGraphDB
 
 # external imports
 import gym
 
 '''
-Set up broadcast facade.
+Set up maker facade.
 '''
 graph: SimpleGraphDB[SimpleGraphKey, SimpleGraphMemento] = SimpleGraphDB()
 
-facade: SimpleBroadcastFacade[SimpleGraphMemento] = SimpleBroadcastFacade(graph = graph)
+facade: SimpleMakerFacade[SimpleGraphMemento] = SimpleMakerFacade(graph = graph)
 
 '''
 Set up a computation.

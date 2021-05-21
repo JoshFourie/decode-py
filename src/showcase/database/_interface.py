@@ -1,5 +1,5 @@
 '''
-ABC types for the broadcast module.
+ABC types for the maker module.
 
 See https://github.com/ZaliaFlow/decode-py/issues/5.
 '''
