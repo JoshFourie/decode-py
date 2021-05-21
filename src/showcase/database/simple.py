@@ -41,7 +41,7 @@ class SimpleGraphDB\
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         '''
-        Sets up a `networkx.DiGraph` structure for writing stateful vertices and stateless directed edges.
+        Sets up a `networkx.DiGraph` structure for writing stateful vertices and stateless direWcted edges.
         '''
         self.__graph = DiGraph()
 
