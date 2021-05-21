@@ -3,8 +3,7 @@ Simple* Collection for the database module.
 '''
 
 # built-in imports
-from typing import Any, Generic, Hashable
-from typing_extensions import TypeAlias
+from typing import Any, Generic, Hashable, TypeVar
 
 # library imports
 from ._interface import PartiallyStatefulDirectedGraphInterface, StatefulVertexGraphLoaderInterface
@@ -17,7 +16,7 @@ from networkx.classes.digraph import DiGraph
 Types.
 '''
 
-SimpleVertexLabel: TypeAlias = Hashable
+SimpleVertexLabel = TypeVar('SimpleVertexLabel', Hashable, int, str, float)
 
 
 '''
@@ -26,7 +25,7 @@ Concrete classes and ABC extensions.
 
 class SimpleGraphDB\
 (
-    Generic[VertexData], 
+    Generic[SimpleVertexLabel, VertexData], 
     PartiallyStatefulDirectedGraphInterface[SimpleVertexLabel, VertexData],
     StatefulVertexGraphLoaderInterface[SimpleVertexLabel, VertexData]
 ):

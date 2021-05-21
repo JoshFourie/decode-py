@@ -228,6 +228,9 @@ class SimpleBroadcastFacade\
     @property
     def context(self) -> SimpleBufferedGraphColouringContext[SimpleGraphKey, NodeMemento]: return self.__strategy.context
 
+    @property
+    def graph(self) -> PartiallyStatefulDirectedGraphInterface[SimpleGraphKey, NodeMemento]: return self.context.writer
+
     '''
     Facade logic.
     '''
