@@ -22,6 +22,9 @@ Basic Components.
 
 ExpansionMatrixType: TypeAlias = Tensor
 
+CompressionMatrixType: TypeAlias = Tensor
+
+
 class ExpansionMatrixFactory:
     '''
     Class that can make an `ExpansionMatrixType`.
@@ -34,8 +37,26 @@ class ExpansionMatrixFactory:
         '''
         d, m = input.shape
         
-        I = eye(d)
+        I: Tensor = eye(d)
 
-        alpha = d / (m*epsilon)
+        alpha: float = d / (m*epsilon)
 
         return alpha * (I + alpha * input@input.T).inverse()
+
+
+class CompressionMatrixFactory:
+    '''
+    Class that can make a `CompressionMatrixType`.
+    '''
+
+    @classmethod
+    def make_compression_matrix(cls, input: Tensor, memberships: Tensor, epsilon: int) -> CompressionMatrixType:
+        '''
+        Makes a `CompressionMatrixType` from `input`, `memberships` and `epsilon`.
+        '''
+        d, m = input.shape
+        
+        I: Tensor = eye(d)
+        alpha: float = d / (m*epsilon)
+
+        return alpha * (I + alpha * input@memberships@input.T).inverse()
